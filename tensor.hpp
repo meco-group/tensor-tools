@@ -24,6 +24,10 @@ class Tensor {
     assert(data.is_dense());
   }
 
+
+  const T& data() const { return data_; }
+  int numel() const { return data_.numel(); }
+
   static std::pair<int, int> normalize_dim(const std::vector<int> & dims);
 
   static void assert_match_dim(const std::vector<int>& a, const std::vector<int>& b) {
@@ -62,6 +66,7 @@ class Tensor {
 
   int n_dims() const {return dims_.size(); }
   const std::vector<int>& dims() const { return dims_; }
+  const int dims(int i) const { return dims_[i]; }
 
   static Tensor sym(const std::string& name, const std::vector<int> & dims) {
     T v = T::sym(name, normalize_dim(dims));
@@ -120,17 +125,17 @@ class Tensor {
     bool fixed = (a.n_dims()==2);
 
     if (!fixed) {
-      for (int i=2;i<a.n_dims();i++) assert(a.dims()[i]==b.dims()[i]);
+      for (int i=2;i<a.n_dims();i++) assert(a.dims(i)==b.dims(i));
     }
 
-    assert(b.dims()[1]==a.dims()[0]);
+    assert(b.dims(1)==a.dims(0));
 
     std::vector<int> new_dims = b.dims();
-    new_dims[0] = a.dims()[0];
+    new_dims[0] = a.dims(0);
 
     int trailing_size = 1;
     std::vector<int> trailing_dim(b.dims().begin()+2, b.dims().end());
-    for (int i=2;i<b.n_dims();i++) trailing_size*= b.dims()[i];
+    for (int i=2;i<b.n_dims();i++) trailing_size*= b.dims(i);
 
     std::cout << trailing_size << std::endl;
 
@@ -138,9 +143,9 @@ class Tensor {
 
     for (int z=0;z<trailing_size;++z) {
       std::vector<int> trailing_ind = sub2ind(trailing_dim, z);
-      for (int i=0;i<a.dims()[0];++i) {
-        for (int j=0;j<a.dims()[1];++j) {
-          for (int k=0;k<b.dims()[2];++k) {
+      for (int i=0;i<a.dims(0);++i) {
+        for (int j=0;j<a.dims(1);++j) {
+          for (int k=0;k<b.dims(2);++k) {
             std::vector<int> a_ind = {i, j};
             if (!fixed) a_ind.insert(a_ind.end(), trailing_ind.begin(), trailing_ind.end());
             std::vector<int> b_ind = {j, k};
@@ -157,9 +162,8 @@ class Tensor {
     return Tensor(data, new_dims);
   }
 
-  const T data_;
-
   private:
+    const T data_;
     const std::vector<int> dims_;
 };
 
