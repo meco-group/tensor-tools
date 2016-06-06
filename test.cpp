@@ -51,5 +51,12 @@ int main() {
   assert(static_cast<double>(norm_inf(got-expected))==0);
 
   std::cout << t6.outer_product(t5).data() << std::endl;
+
+  DT t10 = t5.slice({0, -1, -1});
+  expected = DM(std::vector<std::vector<double> >{{2, 10}, {4, 12}});
+  got = t10.data();
+
+  assert(static_cast<double>(norm_inf(got-expected))==0);
+
   return 0;
 }

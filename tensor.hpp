@@ -83,6 +83,45 @@ class Tensor {
     return Tensor(data_*rhs.data_, dims_);
   }
 
+  /** \brief Make a slice
+  *
+  *   -1  indicates a slice
+  */
+  Tensor slice(const std::vector<int>& ind) const {
+    // Check that input is a permutation of range(n_dims())
+    assert(ind.size()==n_dims());
+
+    std::vector<int> slice_dims;
+
+    std::vector<int> slice_location;
+
+    for (int i=0;i<n_dims();++i) {
+      if (ind[i]==-1) {
+        slice_dims.push_back(dims(i));
+        slice_location.push_back(i);
+      } else {
+        assert(ind[i]>=0);
+        assert(ind[i]<dims(i));
+      }
+    }
+
+    T data = T::zeros(normalize_dim(slice_dims));
+
+
+    for (int i=0;i<data.numel();i++) {
+      std::vector<int> slice_ind = sub2ind(slice_dims, i);
+      std::vector<int> temp_ind =  ind;
+      for (int j=0;j<slice_location.size();++j) {
+        temp_ind[slice_location[j]] = slice_ind[j];
+      }
+
+      int j = ind2sub(dims(), temp_ind);
+      data.nz(i) = data_.nz(j);
+    }
+
+    return Tensor(data, slice_dims);
+  }
+
   /** \brief Generalization of transpose
   */
   Tensor reorder_dims(const std::vector<int>& order) const {
