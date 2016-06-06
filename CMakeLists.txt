@@ -11,17 +11,13 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
 )
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2 -fPIC" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -fPIC" )
 
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -fPIC" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fPIC" )
 
 
 # Simple library that shows how CasADi can be extended
 include_directories(${CASADI_INCLUDE_DIR})
-add_library(tensor SHARED
-            tensor.cpp  tensor.hpp
-          )
-target_link_libraries(tensor ${CASADI_LIBRARIES})
 add_definitions(-DSHARED_LIBRARY)
 
 
@@ -29,6 +25,6 @@ add_executable(testme
             test.cpp
           )
 
-target_link_libraries(testme tensor)
+target_link_libraries(testme ${CASADI_LIBRARIES})
 
 target_include_directories(testme PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
