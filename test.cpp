@@ -35,6 +35,20 @@ int main() {
 
   assert(static_cast<double>(norm_inf(got2-expected2))==0);
 
+  DT t6 = DT(DM(std::vector<std::vector<double> >{{3, 4}, {1, 7}}), {2, 2});
+
+  DT t7 = t6.partial_product(t5);
+
+  DM expected3 = DM({{30, 44, 86, 100}, {44, 60, 108, 124}});
+  DM got3 = t7.data_;
+
+  assert(static_cast<double>(norm_inf(got3-expected3))==0);
+
+  DT t8 = t7.partial_product(t5);
+  DM expected4 = DM({{324, 472, 2260, 2632}, {448, 656, 2816, 3280}});
+  DM got4 = t8.data_;
+
+  assert(static_cast<double>(norm_inf(got4-expected4))==0);
 
   return 0;
 }
