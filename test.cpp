@@ -50,5 +50,6 @@ int main() {
 
   assert(static_cast<double>(norm_inf(got-expected))==0);
 
+  std::cout << t6.outer_product(t5).data() << std::endl;
   return 0;
 }

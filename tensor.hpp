@@ -115,6 +115,27 @@ class Tensor {
     return Tensor(new_data, new_dims);
   }
 
+  /**
+    c_ijkm = a_ij*b_km
+  */
+  Tensor outer_product(const Tensor &b) {
+    std::vector<int> new_dims = dims();
+    new_dims.insert(new_dims.end(), b.dims().begin(), b.dims().end());
+
+    T data = T::zeros(normalize_dim(new_dims));
+    for (int i=0;i<numel();++i) {
+      for (int j=0;j<b.numel();++j) {
+        std::vector<int> ind_a = sub2ind(dims(), i);
+        std::vector<int> ind_b = sub2ind(b.dims(), j);
+        std::vector<int> ind_c = ind_a;
+        ind_c.insert(ind_c.end(), ind_b.begin(), ind_b.end());
+        int k = ind2sub(new_dims, ind_c);
+        data.nz(k) = data_.nz(i)*b.data().nz(j);
+      }
+    }
+    return Tensor(data, new_dims);
+  }
+
   /** \brief Perform a matrix product on the first two indices */
   Tensor partial_product(const Tensor & b) {
     const Tensor& a = *this;
