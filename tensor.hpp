@@ -107,17 +107,17 @@ class Tensor {
 };
 
 template <class T>
-std::pair<int,int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
+std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
     if (dims.size()==2) {
-      return std::pair<int,int>({dims[0],dims[1]});
+      return std::pair<int, int>({dims[0], dims[1]});
     } else if (dims.size()==1) {
-      return std::pair<int,int>({dims[0],1});
+      return std::pair<int, int>({dims[0], 1});
     } else if (dims.size()>2) {
       int prod = 1;
       for (int i=1;i<dims.size();i++) {
         prod*= dims[i];
       }
-      return std::pair<int,int>({dims[0],prod});
+      return std::pair<int, int>({dims[0], prod});
     }
 }
 
