@@ -24,6 +24,16 @@ class Tensor {
     assert(data.is_dense());
   }
 
+  Tensor(const Tensor& t) : data_(t.data()), dims_(t.dims()) {
+  }
+
+  ~Tensor() { }
+
+  Tensor& operator=(const Tensor& t) {
+    dims_ = t.dims();
+    data_ = t.data();
+    return *this;
+  }
 
   const T& data() const { return data_; }
   int numel() const { return data_.numel(); }
@@ -223,8 +233,8 @@ class Tensor {
   }
 
   private:
-    const T data_;
-    const std::vector<int> dims_;
+    T data_;
+    std::vector<int> dims_;
 };
 
 template <class T>
