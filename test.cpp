@@ -85,6 +85,7 @@ int main() {
 
   assert(static_cast<double>(norm_inf(got-expected))==0);
 
+  std::cout << "here" << std::endl;
   // Slice tests
   t10 = t5.slice({0, -1, -1});
   expected = DM(std::vector<std::vector<double> >{{2, 10}, {4, 12}});
@@ -125,8 +126,9 @@ int main() {
   t8 = DT(DM(std::vector<std::vector<double> >{{3, 4}, {1, 7}}), {2, 2});
   t9 = DT(DM(std::vector<double>{1, 2}), {2, 1});
 
-  t8.einstein(t9, std::vector<std::string>{"i", "j"}, std::vector<std::string>{"j", "k"}, std::vector<std::string>{"i", "k"});
+  t8.einstein(t9, {-1, -2}, {-2, -3}, {-1, -3});
 
+  std::cout << mrange(5) << std::endl;
 
   return 0;
 }

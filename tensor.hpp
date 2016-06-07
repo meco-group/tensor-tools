@@ -16,6 +16,14 @@ std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order
   return ret;
 }
 
+std::vector<int> mrange(int stop) {
+  return range(-1, -stop-1, -1);
+}
+
+std::vector<int> mrange(int start, int stop) {
+  return range(-start-1, -stop-1, -1);
+}
+
 template <class T>
 class Tensor {
   public:
@@ -115,21 +123,22 @@ class Tensor {
       }
     }
 
-    T data = T::zeros(normalize_dim(slice_dims));
+    std::cout << ind << std::endl;
 
-
-    for (int i=0;i<data.numel();i++) {
-      std::vector<int> slice_ind = sub2ind(slice_dims, i);
-      std::vector<int> temp_ind =  ind;
-      for (int j=0;j<slice_location.size();++j) {
-        temp_ind[slice_location[j]] = slice_ind[j];
+    int c=1;
+    std::vector<int> a_e;
+    std::vector<int> c_e;
+    for (int i=0;i<ind.size();++i) {
+      if (ind[i]>=0) {
+        a_e.push_back(ind[i]);
+      } else {
+        a_e.push_back(-c);
+        c_e.push_back(-c);
+        c+=1;
       }
-
-      int j = ind2sub(dims(), temp_ind);
-      data.nz(i) = data_.nz(j);
     }
 
-    return Tensor(data, slice_dims);
+    return einstein(a_e, c_e);
   }
 
   /** \brief Generalization of transpose
@@ -150,14 +159,24 @@ class Tensor {
       assert(occ);
     }
 
-    return einstein(Tensor(T::zeros(0,0), {}), range(n_dims()), {}, order);
+    std::vector<int> ind(order.size());
+    for (int i=0;i<ind.size();++i) {
+      ind[i] = -order[i]-1;
+    }
+
+    return einstein(mrange(n_dims()), ind);
   }
 
+  Tensor einstein(const std::vector<int>& a_e, const std::vector<int>& c_e) const {
+    return einstein(Tensor(T::zeros(0, 0), {}), a_e, {}, c_e);
+  }
 
+  Tensor einstein(const Tensor &b, const std::vector<int>& a_e,
+      const std::vector<int>& b_e, const std::vector<int>& c_e) const {
 
-  template<class I>
-  Tensor einstein(const Tensor &b, const std::vector<I>& a_e,
-      const std::vector<I>& b_e, const std::vector<I>& c_e) const {
+        std::cout << "a " << a_e << std::endl;
+        std::cout << "b " << b_e << std::endl;
+        std::cout << "c " << c_e << std::endl;
 
     bool has_b = b.n_dims()>0;
 
@@ -165,22 +184,26 @@ class Tensor {
     assert(n_dims()==a_e.size());
     assert(b.n_dims()==b_e.size());
 
-    std::map<I, int> dim_map;
+    std::map<int, int> dim_map;
 
     // Check if shared nodes dimensions match up
     for (int i=0;i<a_e.size();++i) {
-      auto al = dim_map.find(a_e[i]);
+      int ai = a_e[i];
+      if (ai>=0) continue;
+      auto al = dim_map.find(ai);
       if (al==dim_map.end()) {
-        dim_map[a_e[i]] = dims(i);
+        dim_map[ai] = dims(i);
       } else {
         assert(al->second==dims(i));
       }
     }
 
     for (int i=0;i<b_e.size();++i) {
-      auto bl = dim_map.find(b_e[i]);
+      int bi = b_e[i];
+      if (bi>=0) continue;
+      auto bl = dim_map.find(bi);
       if (bl==dim_map.end()) {
-        dim_map[b_e[i]] = b.dims(i);
+        dim_map[bi] = b.dims(i);
       } else {
         assert(bl->second==b.dims(i));
       }
@@ -188,16 +211,20 @@ class Tensor {
 
     std::vector<int> new_dims;
     for (int i=0;i<c_e.size();++i) {
-      auto cl = dim_map.find(c_e[i]);
+      int ci = c_e[i];
+      assert(ci<0);
+      auto cl = dim_map.find(ci);
       assert(cl!=dim_map.end());
-      new_dims.push_back(dim_map[c_e[i]]);
+      new_dims.push_back(dim_map[ci]);
     }
+
+    std::cout << new_dims << std::endl;
 
     T data = T::zeros(normalize_dim(new_dims));
 
     // Compute the total number of iterations needed
     int n_iter = 1;
-    std::vector<I> dim_map_keys;
+    std::vector<int> dim_map_keys;
     std::vector<int> dim_map_values;
     for (const auto& e : dim_map) {
       n_iter*= e.second;
@@ -205,6 +232,7 @@ class Tensor {
       dim_map_values.push_back(e.second);
     }
 
+    std::cout << n_iter << std::endl;
     // Main loop
     for (int i=0;i<n_iter;++i) {
       std::vector<int> ind_total = sub2ind(dim_map_values, i);
@@ -212,16 +240,22 @@ class Tensor {
       int sub_a, sub_b, sub_c;
 
       for (const auto& ai : a_e) {
-        ind_a.push_back( ind_total[distance(dim_map.begin(),dim_map.find(ai))] );
+
+        ind_a.push_back(ai<0 ? ind_total[distance(dim_map.begin(),dim_map.find(ai))] : ai );
       }
       if (has_b) {
         for (const auto& bi : b_e) {
-          ind_b.push_back( ind_total[distance(dim_map.begin(),dim_map.find(bi))] );
+          ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(),dim_map.find(bi))] : bi );
         }
       }
       for (const auto& ci : c_e) {
-        ind_c.push_back( ind_total[distance(dim_map.begin(),dim_map.find(ci))] );
+        if (ci<0) {
+          ind_c.push_back( ind_total[distance(dim_map.begin(),dim_map.find(ci))] );
+        }
       }
+      std::cout << "a " << ind_a << std::endl;
+      std::cout << "b " << ind_b << std::endl;
+      std::cout << "c " << ind_c << std::endl;
       sub_a = ind2sub(dims(), ind_a);
       if (has_b) sub_b = ind2sub(b.dims(), ind_b);
       sub_c = ind2sub(new_dims, ind_c);
@@ -239,7 +273,7 @@ class Tensor {
     c_ijkm = a_ij*b_km
   */
   Tensor outer_product(const Tensor &b) {
-    return einstein(b, range(n_dims()), range(n_dims(),n_dims()+b.n_dims()), range(n_dims()+b.n_dims()));
+    return einstein(b, mrange(n_dims()), mrange(n_dims(),n_dims()+b.n_dims()), mrange(n_dims()+b.n_dims()));
   }
 
   /** \brief Perform a matrix product on the first two indices */
@@ -260,14 +294,14 @@ class Tensor {
 
     std::vector<int> a_r;
     if (fixed) {
-      a_r = {0, b.n_dims()};
+      a_r = {-1, -b.n_dims()-1};
     } else {
-      a_r = range(a.n_dims());
-      a_r[1] = b.n_dims();
+      a_r = mrange(a.n_dims());
+      a_r[1] = -b.n_dims()-1;
     }
-    std::vector<int> b_r = range(b.n_dims());
-    b_r[0] = b.n_dims();
-    std::vector<int> c_r = range(b.n_dims());
+    std::vector<int> b_r = mrange(b.n_dims());
+    b_r[0] = -b.n_dims()-1;
+    std::vector<int> c_r = mrange(b.n_dims());
 
     return einstein(b, a_r, b_r, c_r);
   }
