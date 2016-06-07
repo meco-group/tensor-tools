@@ -123,8 +123,6 @@ class Tensor {
       }
     }
 
-    std::cout << ind << std::endl;
-
     int c=1;
     std::vector<int> a_e;
     std::vector<int> c_e;
@@ -174,10 +172,6 @@ class Tensor {
   Tensor einstein(const Tensor &b, const std::vector<int>& a_e,
       const std::vector<int>& b_e, const std::vector<int>& c_e) const {
 
-        std::cout << "a " << a_e << std::endl;
-        std::cout << "b " << b_e << std::endl;
-        std::cout << "c " << c_e << std::endl;
-
     bool has_b = b.n_dims()>0;
 
     // Dimension check
@@ -218,8 +212,6 @@ class Tensor {
       new_dims.push_back(dim_map[ci]);
     }
 
-    std::cout << new_dims << std::endl;
-
     T data = T::zeros(normalize_dim(new_dims));
 
     // Compute the total number of iterations needed
@@ -232,7 +224,6 @@ class Tensor {
       dim_map_values.push_back(e.second);
     }
 
-    std::cout << n_iter << std::endl;
     // Main loop
     for (int i=0;i<n_iter;++i) {
       std::vector<int> ind_total = sub2ind(dim_map_values, i);
@@ -253,9 +244,7 @@ class Tensor {
           ind_c.push_back( ind_total[distance(dim_map.begin(),dim_map.find(ci))] );
         }
       }
-      std::cout << "a " << ind_a << std::endl;
-      std::cout << "b " << ind_b << std::endl;
-      std::cout << "c " << ind_c << std::endl;
+
       sub_a = ind2sub(dims(), ind_a);
       if (has_b) sub_b = ind2sub(b.dims(), ind_b);
       sub_c = ind2sub(new_dims, ind_c);
