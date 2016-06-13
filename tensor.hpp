@@ -1,3 +1,6 @@
+#ifndef TENSOR_HPP_INCLUDE
+#define TENSOR_HPP_INCLUDE
+
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -8,6 +11,10 @@ using namespace casadi;
 using namespace std;
 
 template <class T>
+std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order);
+
+#ifndef SWIG
+template <class T>
 std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order) {
   std::vector<T> ret(data.size());
   for (int k=0;k<order.size();k++) {
@@ -15,37 +22,120 @@ std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order
   }
   return ret;
 }
+#endif
 
 template <class T>
 class Tensor {
   public:
 
-  Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {
-    assert(data.is_dense());
-  }
+  Tensor(const T& data, const std::vector<int>& dims);
 
   Tensor(const Tensor& t) : data_(t.data()), dims_(t.dims()) {
   }
 
+  Tensor() { }
+  
   ~Tensor() { }
 
-  Tensor& operator=(const Tensor& t) {
+#ifndef SWIG
+  Tensor& operator=(const Tensor& t);
+#endif
+
+  const T& data() const;
+  int numel() const ;
+
+  static std::pair<int, int> normalize_dim(const std::vector<int> & dims);
+
+  static void assert_match_dim(const std::vector<int>& a, const std::vector<int>& b) ;
+
+  static std::vector<int> sub2ind(const std::vector<int>& dims, int sub) ;
+  static int ind2sub(const std::vector<int>& dims, const std::vector<int>& ind) ;
+
+  static T get(const T& data, const std::vector<int> dims, const std::vector<int>& ind) ;
+
+  static void set(T& data, const std::vector<int> dims, const std::vector<int>& ind,
+                  const T& rhs) ;
+  int n_dims() const ;
+  const std::vector<int>& dims() const ;
+  const int dims(int i) const ;
+
+  static Tensor sym(const std::string& name, const std::vector<int> & dims) ;
+
+  Tensor operator+(const Tensor& rhs) const ;
+  Tensor operator*(const Tensor& rhs) const;
+
+  /** \brief Make a slice
+  *
+  *   -1  indicates a slice
+  */
+  Tensor slice(const std::vector<int>& ind) const ;
+
+  /** \brief Generalization of transpose
+  */
+  Tensor reorder_dims(const std::vector<int>& order) const ;
+
+  /**
+    c_ijkm = a_ij*b_km
+  */
+  Tensor outer_product(const Tensor &b) ;
+
+  /** \brief Perform a matrix product on the first two indices */
+  Tensor partial_product(const Tensor & b) ;
+
+  private:
+    T data_;
+    std::vector<int> dims_;
+
+
+};
+
+
+#ifndef SWIG
+
+template <class T>
+std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
+    if (dims.size()==2) {
+      return std::pair<int, int>({dims[0], dims[1]});
+    } else if (dims.size()==1) {
+      return std::pair<int, int>({dims[0], 1});
+    } else if (dims.size()>2) {
+      int prod = 1;
+      for (int i=1;i<dims.size();i++) {
+        prod*= dims[i];
+      }
+      return std::pair<int, int>({dims[0], prod});
+    }
+
+}
+
+template <class T>
+Tensor<T>::Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {
+    assert(data.is_dense());
+  }
+
+
+
+
+  template <class T>
+Tensor<T>& Tensor<T>::operator=(const Tensor<T>& t) {
     dims_ = t.dims();
     data_ = t.data();
     return *this;
   }
+  template <class T>
+  const T& Tensor<T>::data() const { return data_; }
+  template <class T>
+  int Tensor<T>::numel() const { return data_.numel(); }
 
-  const T& data() const { return data_; }
-  int numel() const { return data_.numel(); }
 
-  static std::pair<int, int> normalize_dim(const std::vector<int> & dims);
 
-  static void assert_match_dim(const std::vector<int>& a, const std::vector<int>& b) {
+   template <class T>
+	void Tensor<T>::assert_match_dim(const std::vector<int>& a, const std::vector<int>& b) {
     assert(a==b);
+ }
 
-  }
-
-  static std::vector<int> sub2ind(const std::vector<int>& dims, int sub) {
+  template <class T>
+std::vector<int> Tensor<T>::sub2ind(const std::vector<int>& dims, int sub) {
     std::vector<int> ret(dims.size());
     int cumprod = 1;
     for (int i=0;i<dims.size();i++) {
@@ -54,7 +144,9 @@ class Tensor {
     }
     return ret;
   }
-  static int ind2sub(const std::vector<int>& dims, const std::vector<int>& ind) {
+
+template <class T>
+  int Tensor<T>::ind2sub(const std::vector<int>& dims, const std::vector<int>& ind) {
     assert(dims.size()==ind.size());
     int ret=0;
     int cumprod = 1;
@@ -65,30 +157,41 @@ class Tensor {
     return ret;
   }
 
-  static T get(const T& data, const std::vector<int> dims, const std::vector<int>& ind) {
+  template <class T>
+T Tensor<T>::get(const T& data, const std::vector<int> dims, const std::vector<int>& ind) {
     return data[ind2sub(dims, ind)];
   }
 
-  static void set(T& data, const std::vector<int> dims, const std::vector<int>& ind,
+    template <class T>
+void Tensor<T>::set(T& data, const std::vector<int> dims, const std::vector<int>& ind,
                   const T& rhs) {
     data[ind2sub(dims, ind)] = rhs;
   }
 
-  int n_dims() const {return dims_.size(); }
-  const std::vector<int>& dims() const { return dims_; }
-  const int dims(int i) const { return dims_[i]; }
+  template <class T>
+int Tensor<T>::n_dims() const {return dims_.size(); }
 
-  static Tensor sym(const std::string& name, const std::vector<int> & dims) {
+
+  template <class T>
+ const std::vector<int>& Tensor<T>::dims() const { return dims_; }
+
+  template <class T>
+ const int Tensor<T>::dims(int i) const { return dims_[i]; }
+
+   template <class T>
+Tensor<T> Tensor<T>::sym(const std::string& name, const std::vector<int> & dims) {
     T v = T::sym(name, normalize_dim(dims));
     return Tensor<T>(v, dims);
   }
 
-  Tensor operator+(const Tensor& rhs) const {
+   template <class T>
+Tensor<T> Tensor<T>::operator+(const Tensor& rhs) const {
     assert_match_dim(dims_, rhs.dims_);
     return Tensor(data_+rhs.data_, dims_);
   }
 
-  Tensor operator*(const Tensor& rhs) const {
+   template <class T>
+Tensor<T> Tensor<T>::operator*(const Tensor& rhs) const {
     assert_match_dim(dims_, rhs.dims_);
     return Tensor(data_*rhs.data_, dims_);
   }
@@ -97,7 +200,8 @@ class Tensor {
   *
   *   -1  indicates a slice
   */
-  Tensor slice(const std::vector<int>& ind) const {
+   template <class T>
+Tensor<T> Tensor<T>::slice(const std::vector<int>& ind) const {
     // Check that input is a permutation of range(n_dims())
     assert(ind.size()==n_dims());
 
@@ -134,7 +238,8 @@ class Tensor {
 
   /** \brief Generalization of transpose
   */
-  Tensor reorder_dims(const std::vector<int>& order) const {
+   template <class T>
+Tensor<T> Tensor<T>::reorder_dims(const std::vector<int>& order) const {
     // Check that input is a permutaion of range(n_dims())
     assert(order.size()==n_dims());
 
@@ -167,7 +272,8 @@ class Tensor {
   /**
     c_ijkm = a_ij*b_km
   */
-  Tensor outer_product(const Tensor &b) {
+   template <class T>
+Tensor<T> Tensor<T>::outer_product(const Tensor &b) {
     std::vector<int> new_dims = dims();
     new_dims.insert(new_dims.end(), b.dims().begin(), b.dims().end());
 
@@ -186,7 +292,8 @@ class Tensor {
   }
 
   /** \brief Perform a matrix product on the first two indices */
-  Tensor partial_product(const Tensor & b) {
+   template <class T>
+Tensor<T> Tensor<T>::partial_product(const Tensor & b) {
     const Tensor& a = *this;
 
     assert(b.n_dims()>=2);
@@ -232,25 +339,9 @@ class Tensor {
     return Tensor(data, new_dims);
   }
 
-  private:
-    T data_;
-    std::vector<int> dims_;
-};
 
-template <class T>
-std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
-    if (dims.size()==2) {
-      return std::pair<int, int>({dims[0], dims[1]});
-    } else if (dims.size()==1) {
-      return std::pair<int, int>({dims[0], 1});
-    } else if (dims.size()>2) {
-      int prod = 1;
-      for (int i=1;i<dims.size();i++) {
-        prod*= dims[i];
-      }
-      return std::pair<int, int>({dims[0], prod});
-    }
-}
+ #endif
 
 typedef Tensor<SX> ST;
 typedef Tensor<DM> DT;
+ #endif
