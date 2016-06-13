@@ -343,5 +343,6 @@ Tensor<T> Tensor<T>::partial_product(const Tensor & b) {
  #endif
 
 typedef Tensor<SX> ST;
+typedef Tensor<MX> MT;
 typedef Tensor<DM> DT;
  #endif
