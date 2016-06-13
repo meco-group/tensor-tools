@@ -88,6 +88,14 @@ int main() {
   got = t10.data();
 
   assert(static_cast<double>(norm_inf(got-expected))==0);
+  
+  DT t0 = DT(1,{});
+  t0 = t0.outer_product(t6);
+  expected = t6.data();
+  got = t0.data();
+  assert(static_cast<double>(norm_inf(got-expected))==0);
+
+  
 
   return 0;
 }
