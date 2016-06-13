@@ -66,12 +66,12 @@ class Tensor {
   }
 
   static T get(const T& data, const std::vector<int> dims, const std::vector<int>& ind) {
-    return data.nz(ind2sub(dims, ind));
+    return data[ind2sub(dims, ind)];
   }
 
   static void set(T& data, const std::vector<int> dims, const std::vector<int>& ind,
                   const T& rhs) {
-    data.nz(ind2sub(dims, ind)) = rhs;
+    data[ind2sub(dims, ind)] = rhs;
   }
 
   int n_dims() const {return dims_.size(); }
@@ -126,7 +126,7 @@ class Tensor {
       }
 
       int j = ind2sub(dims(), temp_ind);
-      data.nz(i) = data_.nz(j);
+      data[i] = data_[j];
     }
 
     return Tensor(data, slice_dims);
@@ -158,7 +158,7 @@ class Tensor {
       std::vector<int> orig_indices = sub2ind(dims_, i);
       std::vector<int> new_indices = reorder(orig_indices, order);
       int j = ind2sub(new_dims, new_indices);
-      new_data.nz(j) = data_.nz(i);
+      new_data[j] = data_[i];
     }
 
     return Tensor(new_data, new_dims);
@@ -179,7 +179,7 @@ class Tensor {
         std::vector<int> ind_c = ind_a;
         ind_c.insert(ind_c.end(), ind_b.begin(), ind_b.end());
         int k = ind2sub(new_dims, ind_c);
-        data.nz(k) = data_.nz(i)*b.data().nz(j);
+        data[k] = data_[i]*b.data()[j];
       }
     }
     return Tensor(data, new_dims);
