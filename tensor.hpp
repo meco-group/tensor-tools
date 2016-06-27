@@ -110,7 +110,7 @@ class Tensor {
   *
   *   -1  indicates a slice
   */
-  Tensor slice(const std::vector<int>& ind) const {
+  Tensor operator()(const std::vector<int>& ind) const {
     // Check that input is a permutation of range(n_dims())
     assert(ind.size()==n_dims());
 

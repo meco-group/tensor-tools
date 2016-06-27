@@ -15,12 +15,12 @@ int main() {
 
   ST t3 = (t+t2)*t;
 
-  std::cout << "t3" << t3.data() << endl;
+  std::cout << "t3" << t3 << endl;
 
   DT t4 = DT(DM({{1, 2, 5, 6}, {3, 4, 7, 8}}), {2, 2, 2});
   DT t5 = t4+t4;
 
-  std::cout << "t" << t5.data() << endl;
+  std::cout << "t" << t5 << endl;
 
   // test sub2ind, ind2sub
   std::vector<int> dims = {3, 2, 4};
@@ -56,7 +56,7 @@ int main() {
 
   assert_equal(got, expected);
 
-  std::cout << t6.outer_product(t5).data() << std::endl;
+  std::cout << t6.outer_product(t5) << std::endl;
 
   // Outer product
   t8 = DT(DM(std::vector<std::vector<double> >{{3, 4}, {1, 7}}), {2, 2});
@@ -92,37 +92,37 @@ int main() {
   assert_equal(got, expected);
 
   // Slice tests
-  t10 = t5.slice({0, -1, -1});
+  t10 = t5({0, -1, -1});
   expected = DM(std::vector<std::vector<double> >{{2, 10}, {4, 12}});
   got = t10.data();
 
   assert_equal(got, expected);
 
-  t10 = t5.slice({1, -1, -1});
+  t10 = t5({1, -1, -1});
   expected = DM(std::vector<std::vector<double> >{{6, 14}, {8, 16}});
   got = t10.data();
 
   assert_equal(got, expected);
 
-  t10 = t5.slice({-1, 0, -1});
+  t10 = t5({-1, 0, -1});
   expected = DM(std::vector<std::vector<double> >{{2, 10}, {6, 14}});
   got = t10.data();
 
   assert_equal(got, expected);
 
-  t10 = t5.slice({-1, 1, -1});
+  t10 = t5({-1, 1, -1});
   expected = DM(std::vector<std::vector<double> >{{4, 12}, {8, 16}});
   got = t10.data();
 
   assert_equal(got, expected);
 
-  t10 = t5.slice({-1, -1, 0});
+  t10 = t5({-1, -1, 0});
   expected = DM(std::vector<std::vector<double> >{{2, 4}, {6, 8}});
   got = t10.data();
 
   assert_equal(got, expected);
 
-  t10 = t5.slice({-1, -1, 1});
+  t10 = t5({-1, -1, 1});
   expected = DM(std::vector<std::vector<double> >{{10, 12}, {14, 16}});
   got = t10.data();
 
@@ -134,11 +134,11 @@ int main() {
   t8.einstein(t9, {-1, -2}, {-2, -3}, {-1, -3});
 
   expected = DM(3);
-  got = t8.slice({0, 0}).data();
+  got = t8({0, 0}).data();
   assert_equal(got, expected);
 
   expected = DM(4);
-  got = t8.slice({0, 1}).data();
+  got = t8({0, 1}).data();
   assert_equal(got, expected);
 
   // Inner product
