@@ -127,5 +127,13 @@ int main() {
 
   t8.einstein(t9, {-1, -2}, {-2, -3}, {-1, -3});
 
+  expected = DM(3);
+  got = t8.slice({0, 0}).data();
+  assert(static_cast<double>(norm_inf(got-expected))==0);
+
+  expected = DM(4);
+  got = t8.slice({0, 1}).data();
+  assert(static_cast<double>(norm_inf(got-expected))==0);
+
   return 0;
 }
