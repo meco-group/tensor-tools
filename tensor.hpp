@@ -19,11 +19,13 @@ std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order
   return ret;
 }
 
-std::vector<int> mrange(int stop) {
+template <class T>
+std::vector<T> mrange(T stop) {
   return range(-1, -stop-1, -1);
 }
 
-std::vector<int> mrange(int start, int stop) {
+template <class T>
+std::vector<T> mrange(T start, T stop) {
   return range(-start-1, -stop-1, -1);
 }
 
@@ -244,7 +246,7 @@ class Tensor {
       }
       for (const auto& ci : c_e) {
         if (ci<0) {
-          ind_c.push_back( ind_total[distance(dim_map.begin(), dim_map.find(ci))]);
+          ind_c.push_back(ind_total[distance(dim_map.begin(), dim_map.find(ci))]);
         }
       }
 
