@@ -174,43 +174,57 @@ class Tensor {
     return einstein(Tensor(T::zeros(0, 0), {}), a_e, {}, c_e);
   }
 
-  Tensor einstein(const Tensor &b, const std::vector<int>& a_e,
-      const std::vector<int>& b_e, const std::vector<int>& c_e) const {
+  /** \brief Compute any contraction of two tensors, using index/einstein notation
 
-    bool has_b = b.n_dims()>0;
+    A.einstein(B, a, b, c) -> C
+
+    Given two tensors, A and B, computes a third tensor C such that:
+
+    C_c = A_a * B_b
+
+    With a, b, c representing einstein indices.
+    Instead of the classical index labels i,j,k,... we employ -1,-2,-3,...
+
+  */
+  Tensor einstein(const Tensor &B, const std::vector<int>& a,
+      const std::vector<int>& b, const std::vector<int>& c) const {
+
+    const Tensor& A = *this;
+
+    bool has_B = B.n_dims()>0;
 
     // Dimension check
-    assert(n_dims()==a_e.size());
-    assert(b.n_dims()==b_e.size());
+    assert(A.n_dims()==a.size());
+    assert(B.n_dims()==b.size());
 
     std::map<int, int> dim_map;
 
     // Check if shared nodes dimensions match up
-    for (int i=0;i<a_e.size();++i) {
-      int ai = a_e[i];
+    for (int i=0;i<a.size();++i) {
+      int ai = a[i];
       if (ai>=0) continue;
       auto al = dim_map.find(ai);
       if (al==dim_map.end()) {
-        dim_map[ai] = dims(i);
+        dim_map[ai] = A.dims(i);
       } else {
-        assert(al->second==dims(i));
+        assert(al->second==A.dims(i));
       }
     }
 
-    for (int i=0;i<b_e.size();++i) {
-      int bi = b_e[i];
+    for (int i=0;i<b.size();++i) {
+      int bi = b[i];
       if (bi>=0) continue;
       auto bl = dim_map.find(bi);
       if (bl==dim_map.end()) {
-        dim_map[bi] = b.dims(i);
+        dim_map[bi] = B.dims(i);
       } else {
-        assert(bl->second==b.dims(i));
+        assert(bl->second==B.dims(i));
       }
     }
 
     std::vector<int> new_dims;
-    for (int i=0;i<c_e.size();++i) {
-      int ci = c_e[i];
+    for (int i=0;i<c.size();++i) {
+      int ci = c[i];
       assert(ci<0);
       auto cl = dim_map.find(ci);
       assert(cl!=dim_map.end());
@@ -235,26 +249,25 @@ class Tensor {
       std::vector<int> ind_a, ind_b, ind_c;
       int sub_a, sub_b, sub_c;
 
-      for (const auto& ai : a_e) {
-
+      for (const auto& ai : a) {
         ind_a.push_back(ai<0 ? ind_total[distance(dim_map.begin(), dim_map.find(ai))] : ai);
       }
-      if (has_b) {
-        for (const auto& bi : b_e) {
+      if (has_B) {
+        for (const auto& bi : b) {
           ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(), dim_map.find(bi))] : bi);
         }
       }
-      for (const auto& ci : c_e) {
+      for (const auto& ci : c) {
         if (ci<0) {
           ind_c.push_back(ind_total[distance(dim_map.begin(), dim_map.find(ci))]);
         }
       }
 
-      sub_a = ind2sub(dims(), ind_a);
-      if (has_b) sub_b = ind2sub(b.dims(), ind_b);
+      sub_a = ind2sub(A.dims(), ind_a);
+      if (has_B) sub_b = ind2sub(B.dims(), ind_b);
       sub_c = ind2sub(new_dims, ind_c);
-      if (has_b) {
-        data[sub_c]+= data_[sub_a]*b.data()[sub_b];
+      if (has_B) {
+        data[sub_c]+= data_[sub_a]*B.data()[sub_b];
       } else {
         data[sub_c]+= data_[sub_a];
       }
@@ -300,6 +313,15 @@ class Tensor {
 
     return einstein(b, a_r, b_r, c_r);
   }
+
+  #ifndef SWIG
+  /// Print a representation of the object to a stream (shorthand)
+  inline friend
+      std::ostream& operator<<(std::ostream &stream, const Tensor& obj) {
+          return stream << "Tensor(" << obj.data_.type_name() << ", "
+            << obj.dims() << "): " << obj.data();
+      }
+  #endif // SWIG
 
   private:
     T data_;
