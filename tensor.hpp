@@ -1,3 +1,6 @@
+#ifndef TENSOR_HPP_INCLUDE
+#define TENSOR_HPP_INCLUDE
+
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -74,12 +77,12 @@ class Tensor {
   }
 
   static T get(const T& data, const std::vector<int> dims, const std::vector<int>& ind) {
-    return data.nz(ind2sub(dims, ind));
+    return data[ind2sub(dims, ind)];
   }
 
   static void set(T& data, const std::vector<int> dims, const std::vector<int>& ind,
                   const T& rhs) {
-    data.nz(ind2sub(dims, ind)) = rhs;
+    data[ind2sub(dims, ind)] = rhs;
   }
 
   int n_dims() const {return dims_.size(); }
@@ -232,16 +235,16 @@ class Tensor {
 
       for (const auto& ai : a_e) {
 
-        ind_a.push_back(ai<0 ? ind_total[distance(dim_map.begin(),dim_map.find(ai))] : ai );
+        ind_a.push_back(ai<0 ? ind_total[distance(dim_map.begin(), dim_map.find(ai))] : ai);
       }
       if (has_b) {
         for (const auto& bi : b_e) {
-          ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(),dim_map.find(bi))] : bi );
+          ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(), dim_map.find(bi))] : bi);
         }
       }
       for (const auto& ci : c_e) {
         if (ci<0) {
-          ind_c.push_back( ind_total[distance(dim_map.begin(),dim_map.find(ci))] );
+          ind_c.push_back( ind_total[distance(dim_map.begin(), dim_map.find(ci))]);
         }
       }
 
@@ -249,9 +252,9 @@ class Tensor {
       if (has_b) sub_b = ind2sub(b.dims(), ind_b);
       sub_c = ind2sub(new_dims, ind_c);
       if (has_b) {
-        data.nz(sub_c)+= data_.nz(sub_a)*b.data().nz(sub_b);
+        data[sub_c]+= data_[sub_a]*b.data()[sub_b];
       } else {
-        data.nz(sub_c)+= data_.nz(sub_a);
+        data[sub_c]+= data_[sub_a];
       }
     }
 
@@ -262,7 +265,8 @@ class Tensor {
     c_ijkm = a_ij*b_km
   */
   Tensor outer_product(const Tensor &b) {
-    return einstein(b, mrange(n_dims()), mrange(n_dims(),n_dims()+b.n_dims()), mrange(n_dims()+b.n_dims()));
+    return einstein(b, mrange(n_dims()), mrange(n_dims(), n_dims()+b.n_dims()),
+                                         mrange(n_dims()+b.n_dims()));
   }
 
   /** \brief Perform a matrix product on the first two indices */
@@ -317,3 +321,6 @@ std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
 
 typedef Tensor<SX> ST;
 typedef Tensor<DM> DT;
+typedef Tensor<MX> MT;
+
+#endif
