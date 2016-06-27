@@ -1,6 +1,12 @@
 #include <tensor.hpp>
 
 
+template<class T, class S>
+void assert_equal(T a, S b) {
+  assert(static_cast<double>(norm_inf(a-b))==0);
+}
+
+
 int main() {
 
   ST t = ST::sym("t", {2, 4, 5});
@@ -133,6 +139,18 @@ int main() {
 
   expected = DM(4);
   got = t8.slice({0, 1}).data();
+  assert(static_cast<double>(norm_inf(got-expected))==0);
+
+  // Inner product
+  DT v1 = DT(DM(std::vector<double>{0, 1, 2}), {3});
+  DT v2 = DT(DM(std::vector<double>{1, 2, 3}), {3});
+
+
+  DT m1 = DT(DM(std::vector<std::vector<double>>{{0, 1}, {2, 3}, {4, 5}}), {3, 2});
+
+  expected = DM(std::vector<double>{10, 13});
+  got = v1.einstein(m1, {-1}, {-1,-2}, {-2}).data();
+
   assert(static_cast<double>(norm_inf(got-expected))==0);
 
   return 0;
