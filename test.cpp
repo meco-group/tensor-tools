@@ -34,12 +34,12 @@ int main() {
   DM got = t5.reorder_dims({0, 2, 1}).data();
 
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   expected = DM({{2, 10, 6, 14}, {4, 12, 8, 16}});
   got = t5.reorder_dims({1, 2, 0}).data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   DT t6 = DT(DM(std::vector<std::vector<double> >{{3, 4}, {1, 7}}), {2, 2});
 
@@ -48,13 +48,13 @@ int main() {
   expected = DM({{30, 44, 86, 100}, {44, 60, 108, 124}});
   got = t7.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   DT t8 = t7.partial_product(t5);
   expected = DM({{324, 472, 2260, 2632}, {448, 656, 2816, 3280}});
   got = t8.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   std::cout << t6.outer_product(t5).data() << std::endl;
 
@@ -69,7 +69,7 @@ int main() {
   got = t10.data();
 
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t9 = DT(DM(std::vector<double>{1, 2}), {1, 2});
 
@@ -79,7 +79,7 @@ int main() {
   expected = DM({{3, 4, 6, 8}, {1, 7, 2, 14}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t9 = DT(DM(std::vector<double>{1, 2}), {2});
 
@@ -89,44 +89,44 @@ int main() {
   expected = DM({{3, 4, 6, 8}, {1, 7, 2, 14}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   // Slice tests
   t10 = t5.slice({0, -1, -1});
   expected = DM(std::vector<std::vector<double> >{{2, 10}, {4, 12}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t10 = t5.slice({1, -1, -1});
   expected = DM(std::vector<std::vector<double> >{{6, 14}, {8, 16}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t10 = t5.slice({-1, 0, -1});
   expected = DM(std::vector<std::vector<double> >{{2, 10}, {6, 14}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t10 = t5.slice({-1, 1, -1});
   expected = DM(std::vector<std::vector<double> >{{4, 12}, {8, 16}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t10 = t5.slice({-1, -1, 0});
   expected = DM(std::vector<std::vector<double> >{{2, 4}, {6, 8}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t10 = t5.slice({-1, -1, 1});
   expected = DM(std::vector<std::vector<double> >{{10, 12}, {14, 16}});
   got = t10.data();
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   t8 = DT(DM(std::vector<std::vector<double> >{{3, 4}, {1, 7}}), {2, 2});
   t9 = DT(DM(std::vector<double>{1, 2}), {2, 1});
@@ -135,11 +135,11 @@ int main() {
 
   expected = DM(3);
   got = t8.slice({0, 0}).data();
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   expected = DM(4);
   got = t8.slice({0, 1}).data();
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   // Inner product
   DT v1 = DT(DM(std::vector<double>{0, 1, 2}), {3});
@@ -153,7 +153,7 @@ int main() {
 
   std::cout << v1.einstein(m1, {-1}, {-1, -2}, {-2}) << std::endl;
 
-  assert(static_cast<double>(norm_inf(got-expected))==0);
+  assert_equal(got, expected);
 
   return 0;
 }
