@@ -40,6 +40,9 @@ class Tensor {
   Tensor(const Tensor& t) : data_(t.data()), dims_(t.dims()) {
   }
 
+  Tensor(double a) : data_({a}), dims_({}) {
+  }
+
   ~Tensor() { }
 
   Tensor& operator=(const Tensor& t) {
@@ -196,6 +199,14 @@ class Tensor {
     // Dimension check
     assert(A.n_dims()==a.size());
     assert(B.n_dims()==b.size());
+    
+    assert(c.size()<=a.size()+b.size());
+    
+    // Short circuit for scalar case
+    if (A.n_dims()==0 && B.n_dims()==0) return Tensor(A.data()*B.data(), {});
+    
+    // Make sure that A is non-scalar
+    if (A.n_dims()==0) return B.einstein(A, b, a, c);
 
     std::map<int, int> dim_map;
 
@@ -282,6 +293,22 @@ class Tensor {
   Tensor outer_product(const Tensor &b) {
     return einstein(b, mrange(n_dims()), mrange(n_dims(), n_dims()+b.n_dims()),
                                          mrange(n_dims()+b.n_dims()));
+  }
+  
+  Tensor inner(const Tensor&b) {
+    const Tensor& a = *this;
+    
+    //assert(a.dims(0)==b.dims(0));
+    int shared_dim = min(a.n_dims(), b.n_dims());
+    int max_dim    = max(a.n_dims(), b.n_dims());
+    std::vector<int> common = mrange(shared_dim);
+    
+    std::vector<int> c_r = mrange(shared_dim, max_dim);
+    
+    std::vector<int> a_r = a.n_dims()>b.n_dims() ? mrange(a.n_dims()) : common;
+    std::vector<int> b_r = b.n_dims()>a.n_dims() ? mrange(b.n_dims()) : common;
+
+    return einstein(b, a_r, b_r, c_r);
   }
 
   /** \brief Perform a matrix product on the first two indices */
