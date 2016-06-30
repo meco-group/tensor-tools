@@ -174,7 +174,7 @@ class Tensor {
   }
 
   Tensor einstein(const std::vector<int>& a_e, const std::vector<int>& c_e) const {
-    return einstein(Tensor(T::zeros(0, 0), {}), a_e, {}, c_e);
+    return einstein(Tensor(1, {}), a_e, {}, c_e);
   }
 
   /** \brief Compute any contraction of two tensors, using index/einstein notation
@@ -194,20 +194,12 @@ class Tensor {
 
     const Tensor& A = *this;
 
-    bool has_B = B.n_dims()>0;
-
     // Dimension check
     assert(A.n_dims()==a.size());
     assert(B.n_dims()==b.size());
     
     assert(c.size()<=a.size()+b.size());
     
-    // Short circuit for scalar case
-    if (A.n_dims()==0 && B.n_dims()==0) return Tensor(A.data()*B.data(), {});
-    
-    // Make sure that A is non-scalar
-    if (A.n_dims()==0) return B.einstein(A, b, a, c);
-
     std::map<int, int> dim_map;
 
     // Check if shared nodes dimensions match up
@@ -263,10 +255,8 @@ class Tensor {
       for (const auto& ai : a) {
         ind_a.push_back(ai<0 ? ind_total[distance(dim_map.begin(), dim_map.find(ai))] : ai);
       }
-      if (has_B) {
-        for (const auto& bi : b) {
-          ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(), dim_map.find(bi))] : bi);
-        }
+      for (const auto& bi : b) {
+        ind_b.push_back(bi<0 ? ind_total[distance(dim_map.begin(), dim_map.find(bi))] : bi);
       }
       for (const auto& ci : c) {
         if (ci<0) {
@@ -275,13 +265,10 @@ class Tensor {
       }
 
       sub_a = ind2sub(A.dims(), ind_a);
-      if (has_B) sub_b = ind2sub(B.dims(), ind_b);
+      sub_b = ind2sub(B.dims(), ind_b);
       sub_c = ind2sub(new_dims, ind_c);
-      if (has_B) {
-        data[sub_c]+= data_[sub_a]*B.data()[sub_b];
-      } else {
-        data[sub_c]+= data_[sub_a];
-      }
+      data[sub_c]+= data_[sub_a]*B.data()[sub_b];
+
     }
 
     return Tensor(data, new_dims);

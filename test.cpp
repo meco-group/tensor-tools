@@ -174,15 +174,15 @@ int main() {
   
   expected = DM(std::vector<double>{35});
   got = s1.inner(s2).data();
-  
   assert_equal(got, expected);
   
   expected = DM(std::vector<double>{0, 5, 10});
   got = s1.inner(v1).data();
+  assert_equal(got, expected);
   
   expected = DM(std::vector<double>{0, 5, 10});
   got = v1.inner(s1).data();
- 
+  assert_equal(got, expected);
   
   return 0;
 }
