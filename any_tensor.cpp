@@ -86,7 +86,7 @@ std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
   return ret;
 }
 
-bool is_double(const std::vector<AnyScalar>& v) {
+bool AnyScalar::is_double(const std::vector<AnyScalar>& v) {
   bool ret = true;
   for (auto &i : v) {
     ret &= i.is_double();
