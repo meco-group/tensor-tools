@@ -48,6 +48,7 @@ class AnyTensor {
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
 
     AnyTensor outer_product(const AnyTensor &b);
+    AnyTensor inner(const AnyTensor&b);
 
   private:
     TensorType t;

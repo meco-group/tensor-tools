@@ -27,7 +27,31 @@ AnyTensor AnyTensor::unity() {
 }
 
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
-  return data_double->outer_product(*b.data_double);
+  switch(t) {
+    case TENSOR_DOUBLE:
+      return data_double->outer_product(*b.data_double);
+      break;
+    case TENSOR_SX:
+      //return data_sx->outer_product(*b.data_sx);
+      break;
+    case TENSOR_MX:
+      //return data_mx->outer_product(*b.mx);
+      break;
+  }
+}
+
+AnyTensor AnyTensor::inner(const AnyTensor &b) {
+  switch(t) {
+    case TENSOR_DOUBLE:
+      return data_double->inner(*b.data_double);
+      break;
+    case TENSOR_SX:
+      //return data_sx->inner(*b.data_sx);
+      break;
+    case TENSOR_MX:
+      //return data_mx->inner(*b.mx);
+      break;
+  }
 }
 
 std::vector<int> AnyTensor::dims() const {
