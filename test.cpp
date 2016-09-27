@@ -1,4 +1,4 @@
-#include <tensor.hpp>
+#include <any_tensor.hpp>
 
 
 template<class T, class S>
@@ -6,6 +6,27 @@ void assert_equal(T a, S b) {
   assert(static_cast<double>(norm_inf(a-b))==0);
 }
 
+template<>
+void assert_equal(double a, double b) {
+  assert(a-b==0);
+}
+
+template<>
+void assert_equal(const std::vector<double>& a, const std::vector<double>& b) {
+  assert(a==b);
+}
+
+template<>
+void assert_equal(std::vector<double> a, std::vector<double> b) {
+  assert(a==b);
+}
+
+template<>
+void assert_equal(AnyTensor a, AnyTensor b) {
+  //assert(a.equals(b));
+  assert(a.dims()==b.dims());
+  //assert(a.data()==b.data());
+}
 
 int main() {
 
@@ -140,7 +161,7 @@ int main() {
   expected = DM(4);
   got = t8({0, 1}).data();
   assert_equal(got, expected);
-  
+
   // Scalar
   expected = DM(5);
   got = DT(5.0).data();
@@ -158,31 +179,59 @@ int main() {
 
   got = v2.inner(v1).data();
   assert_equal(got, expected);
-  
+
   DT m1 = DT(DM(std::vector<std::vector<double>>{{0, 1}, {2, 3}, {4, 5}}), {3, 2});
 
   expected = DM(std::vector<double>{10, 13});
-  
+
   got = v1.inner(m1).data();
   assert_equal(got, expected);
-  
+
   got = m1.inner(v1).data();
   assert_equal(got, expected);
-  
+
   DT s1 = DT(5.0);
   DT s2 = DT(7.0);
-  
+
   expected = DM(std::vector<double>{35});
   got = s1.inner(s2).data();
   assert_equal(got, expected);
-  
+
   expected = DM(std::vector<double>{0, 5, 10});
   got = s1.inner(v1).data();
   assert_equal(got, expected);
-  
+
   expected = DM(std::vector<double>{0, 5, 10});
   got = v1.inner(s1).data();
   assert_equal(got, expected);
+
+  AnyScalar a = 1.5;
+
+  double w = a;
+  assert_equal(1.5, w);
+
+  {
+    AnyScalar a = SX(1.5);
+    SX w = a;
+    assert_equal(1.5, w);
+  }
   
+  {
+
+    std::vector<AnyScalar> v = {2, 3};
+    AnyTensor t = vertcat(v);
+
+    //assert_equal(t, AnyTensor(DT(DM({{2, 3}}),{2})));
+
+    std::vector<double> d = AnyScalar::vector_double(v);
+
+    assert_equal(d, std::vector<double>{2, 3});
+  }
+
+  {
+    AnyTensor a = AnyTensor::unity();
+
+  }
+
   return 0;
 }
