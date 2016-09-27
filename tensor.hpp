@@ -197,9 +197,9 @@ class Tensor {
     // Dimension check
     assert(A.n_dims()==a.size());
     assert(B.n_dims()==b.size());
-    
+
     assert(c.size()<=a.size()+b.size());
-    
+
     std::map<int, int> dim_map;
 
     // Check if shared nodes dimensions match up
@@ -281,17 +281,17 @@ class Tensor {
     return einstein(b, mrange(n_dims()), mrange(n_dims(), n_dims()+b.n_dims()),
                                          mrange(n_dims()+b.n_dims()));
   }
-  
+
   Tensor inner(const Tensor&b) {
     const Tensor& a = *this;
-    
+
     //assert(a.dims(0)==b.dims(0));
     int shared_dim = min(a.n_dims(), b.n_dims());
     int max_dim    = max(a.n_dims(), b.n_dims());
     std::vector<int> common = mrange(shared_dim);
-    
+
     std::vector<int> c_r = mrange(shared_dim, max_dim);
-    
+
     std::vector<int> a_r = a.n_dims()>b.n_dims() ? mrange(a.n_dims()) : common;
     std::vector<int> b_r = b.n_dims()>a.n_dims() ? mrange(b.n_dims()) : common;
 

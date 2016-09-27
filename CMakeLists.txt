@@ -21,10 +21,15 @@ include_directories(${CASADI_INCLUDE_DIR})
 add_definitions(-DSHARED_LIBRARY)
 
 
+add_library(tensortools
+            any_tensor.cpp any_tensor.hpp tensor.hpp
+          )
+
+
 add_executable(testme
             test.cpp
           )
 
-target_link_libraries(testme ${CASADI_LIBRARIES})
+target_link_libraries(testme ${CASADI_LIBRARIES} tensortools)
 
 target_include_directories(testme PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
