@@ -11,6 +11,13 @@ void assert_equal(double a, double b) {
   assert(a-b==0);
 }
 
+template<>
+void assert_equal(AnyTensor a, AnyTensor b) {
+  //assert(a.equals(b));
+  assert(a.dims()==b.dims());
+  //assert(a.data()==b.data());
+}
+
 int main() {
 
   ST t = ST::sym("t", {2, 4, 5});
@@ -192,5 +199,15 @@ int main() {
 
   double w = a;
   assert_equal(1.5, w);
+
+  {
+
+    std::vector<AnyScalar> v = {2, 3};
+    AnyTensor t = vertcat(v);
+
+    //assert_equal(t, AnyTensor(DT(DM({{2, 3}}),{2})));
+  }
+
+
   return 0;
 }

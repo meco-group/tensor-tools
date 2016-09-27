@@ -15,6 +15,9 @@ class AnyScalar {
     AnyScalar(double s);
     AnyScalar();
     operator double() const;
+    bool isDouble() const;
+    bool isSX() const;
+    bool isMX() const;
   private:
     TensorType t;
     double data_double;
@@ -31,6 +34,11 @@ class AnyTensor {
     AnyTensor(const DT & t);
     AnyTensor();
     ~AnyTensor();
+    bool isDouble() const;
+    bool isSX() const;
+    bool isMX() const;
+    std::vector<int> dims() const;
+    //bool equals(const AnyTensor&rhs) const;
 
     operator DT() const;
 

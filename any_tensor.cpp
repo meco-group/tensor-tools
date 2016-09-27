@@ -1,6 +1,50 @@
 #include "any_tensor.hpp"
 
 
+
+bool AnyScalar::isDouble() const {
+  return t == TENSOR_DOUBLE;
+}
+bool AnyScalar::isSX() const {
+  return t == TENSOR_SX;
+}
+bool AnyScalar::isMX() const {
+  return t == TENSOR_MX;
+}
+
+bool AnyTensor::isDouble() const {
+  return t == TENSOR_DOUBLE;
+}
+bool AnyTensor::isSX() const {
+  return t == TENSOR_SX;
+}
+bool AnyTensor::isMX() const {
+  return t == TENSOR_MX;
+}
+
+std::vector<int> AnyTensor::dims() const {
+  switch(t) {
+    case TENSOR_DOUBLE:
+      return data_double->dims();
+      break;
+    case TENSOR_SX:
+      return data_sx->dims();
+      break;
+    case TENSOR_MX:
+      return data_mx->dims();
+      break;
+  }
+}
+
+/**bool AnyTensor::equals(const AnyTensor& rhs) const {
+  if (dims()==rhs.dims()) {
+    if (TENSOR_DOUBLE) {
+      return static_cast<double>(norm_inf((*this)-rhs))==0;
+    }
+  }
+  return false;
+}*/
+
 AnyScalar::AnyScalar(const AnyScalar& s) {
   t = s.t;
   data_double = s.data_double;
