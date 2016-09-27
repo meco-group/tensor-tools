@@ -13,8 +13,12 @@ class AnyScalar {
     AnyScalar& operator=(const AnyScalar&);
     AnyScalar(const AnyScalar& s);
     AnyScalar(double s);
+    AnyScalar(const SX& s);
+    AnyScalar(const MX& s);
     AnyScalar();
     operator double() const;
+    operator SX() const;
+    operator MX() const;
     bool is_double() const;
     bool is_SX() const;
     bool is_MX() const;
@@ -34,6 +38,8 @@ class AnyTensor {
     AnyTensor(const AnyTensor& s);
     //AnyTensor(const AnyTensor&, const std::vector<int>& dim);
     AnyTensor(const DT & t);
+    AnyTensor(const ST & t);
+    AnyTensor(const MT & t);
     static AnyTensor unity();
     AnyTensor();
     ~AnyTensor();
@@ -44,7 +50,8 @@ class AnyTensor {
     //bool equals(const AnyTensor&rhs) const;
 
     operator DT() const;
-
+    operator ST() const;
+    operator MT() const;
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
 
     AnyTensor outer_product(const AnyTensor &b);

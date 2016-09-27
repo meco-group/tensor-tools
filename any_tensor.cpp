@@ -114,6 +114,16 @@ AnyScalar::AnyScalar(double s) {
   data_double = s;
 }
 
+AnyScalar::AnyScalar(const SX& s) {
+  t = TENSOR_SX;
+  data_sx = s;
+}
+
+AnyScalar::AnyScalar(const MX& s) {
+  t = TENSOR_MX;
+  data_mx = s;
+}
+
 AnyScalar::AnyScalar() {
   t = TENSOR_NULL;
   data_double = 0;
@@ -148,6 +158,20 @@ AnyTensor::AnyTensor(const DT & s) {
   data_mx = 0;
 }
 
+AnyTensor::AnyTensor(const ST & s) {
+  t = TENSOR_SX;
+  data_double = 0;
+  data_sx = new ST(s);
+  data_mx = 0;
+}
+
+AnyTensor::AnyTensor(const MT & s) {
+  t = TENSOR_MX;
+  data_double = 0;
+  data_sx = 0;
+  data_mx = new MT(s);
+}
+
 //AnyTensor::AnyTensor(const AnyScalar& s) {
 //  if (s.t == TENSOR_DOUBLE) {
 //
@@ -164,6 +188,16 @@ AnyTensor::AnyTensor() {
 AnyTensor::operator DT() const {
   assert(TENSOR_DOUBLE);
   return DT(*data_double);
+}
+
+AnyTensor::operator ST() const {
+  assert(TENSOR_SX);
+  return ST(*data_sx);
+}
+
+AnyTensor::operator MT() const {
+  assert(TENSOR_MX);
+  return MT(*data_mx);
 }
 
 AnyTensor::~AnyTensor() {
