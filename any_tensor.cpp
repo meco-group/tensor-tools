@@ -22,6 +22,10 @@ bool AnyTensor::is_MX() const {
   return t == TENSOR_MX;
 }
 
+AnyTensor AnyTensor::unity() {
+  return DT(1, {});
+}
+
 std::vector<int> AnyTensor::dims() const {
   switch(t) {
     case TENSOR_DOUBLE:

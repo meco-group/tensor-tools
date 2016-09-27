@@ -34,6 +34,7 @@ class AnyTensor {
     AnyTensor(const AnyTensor& s);
     //AnyTensor(const AnyTensor&, const std::vector<int>& dim);
     AnyTensor(const DT & t);
+    static AnyTensor unity();
     AnyTensor();
     ~AnyTensor();
     bool is_double() const;

@@ -222,5 +222,10 @@ int main() {
     assert_equal(d, std::vector<double>{2, 3});
   }
 
+  {
+    AnyTensor a = AnyTensor::unity();
+
+  }
+
   return 0;
 }
