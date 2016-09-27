@@ -18,6 +18,7 @@ class AnyScalar {
     bool isDouble() const;
     bool isSX() const;
     bool isMX() const;
+    static std::vector<double> vector_double(const std::vector<AnyScalar>& v);
   private:
     TensorType t;
     double data_double;
@@ -43,6 +44,7 @@ class AnyTensor {
     operator DT() const;
 
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
+
   private:
     TensorType t;
     DT* data_double;

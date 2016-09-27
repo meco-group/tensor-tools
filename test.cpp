@@ -12,6 +12,16 @@ void assert_equal(double a, double b) {
 }
 
 template<>
+void assert_equal(const std::vector<double>& a, const std::vector<double>& b) {
+  assert(a==b);
+}
+
+template<>
+void assert_equal(std::vector<double> a, std::vector<double> b) {
+  assert(a==b);
+}
+
+template<>
 void assert_equal(AnyTensor a, AnyTensor b) {
   //assert(a.equals(b));
   assert(a.dims()==b.dims());
@@ -206,8 +216,11 @@ int main() {
     AnyTensor t = vertcat(v);
 
     //assert_equal(t, AnyTensor(DT(DM({{2, 3}}),{2})));
-  }
 
+    std::vector<double> d = AnyScalar::vector_double(v);
+
+    assert_equal(d, std::vector<double>{2, 3});
+  }
 
   return 0;
 }

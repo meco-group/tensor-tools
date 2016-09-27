@@ -45,6 +45,15 @@ std::vector<int> AnyTensor::dims() const {
   return false;
 }*/
 
+std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
+  std::vector<double> ret;
+  ret.reserve(v.size());
+  for (auto &i : v) {
+    ret.push_back(i);
+  }
+  return ret;
+}
+
 AnyScalar::AnyScalar(const AnyScalar& s) {
   t = s.t;
   data_double = s.data_double;
