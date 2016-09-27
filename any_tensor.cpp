@@ -28,7 +28,7 @@ AnyScalar::AnyScalar() {
   data_mx = 0;
 }
 
-AnyScalar::operator double() {
+AnyScalar::operator double() const {
   assert(TENSOR_DOUBLE);
   return data_double;
 }
@@ -68,7 +68,7 @@ AnyTensor::AnyTensor() {
   data_mx = 0;
 }
 
-AnyTensor::operator DT() {
+AnyTensor::operator DT() const {
   assert(TENSOR_DOUBLE);
   return DT(*data_double);
 }
@@ -77,4 +77,25 @@ AnyTensor::~AnyTensor() {
   if (data_double) delete data_double;
   if (data_sx) delete data_sx;
   if (data_mx) delete data_mx;
+}
+
+
+AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
+  std::vector<double> ret;
+  ret.reserve(v.size());
+  for (auto & i : v) {
+    ret.push_back(i);
+  }
+  return DT(v, {v.size()});
+}
+
+/**
+AnyTensor::AnyTensor(const std::vector<AnyScalar>&v, const std::vector<int>& dim) {
+  std::vector<>
+}
+*/
+
+
+AnyTensor vertcat(const std::vector<AnyScalar> & v) {
+  return AnyTensor::vertcat(v);
 }
