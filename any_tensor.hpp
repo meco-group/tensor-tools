@@ -15,10 +15,11 @@ class AnyScalar {
     AnyScalar(double s);
     AnyScalar();
     operator double() const;
-    bool isDouble() const;
-    bool isSX() const;
-    bool isMX() const;
+    bool is_double() const;
+    bool is_SX() const;
+    bool is_MX() const;
     static std::vector<double> vector_double(const std::vector<AnyScalar>& v);
+    static bool is_double(const std::vector<AnyScalar>& v);
   private:
     TensorType t;
     double data_double;
@@ -35,9 +36,9 @@ class AnyTensor {
     AnyTensor(const DT & t);
     AnyTensor();
     ~AnyTensor();
-    bool isDouble() const;
-    bool isSX() const;
-    bool isMX() const;
+    bool is_double() const;
+    bool is_SX() const;
+    bool is_MX() const;
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
 
@@ -54,5 +55,6 @@ class AnyTensor {
 
 
 AnyTensor vertcat(const std::vector<AnyScalar> & v);
+AnyTensor vertcat(const std::vector<double> & v);
 
 #endif

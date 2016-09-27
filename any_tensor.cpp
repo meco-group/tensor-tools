@@ -2,23 +2,23 @@
 
 
 
-bool AnyScalar::isDouble() const {
+bool AnyScalar::is_double() const {
   return t == TENSOR_DOUBLE;
 }
-bool AnyScalar::isSX() const {
+bool AnyScalar::is_SX() const {
   return t == TENSOR_SX;
 }
-bool AnyScalar::isMX() const {
+bool AnyScalar::is_MX() const {
   return t == TENSOR_MX;
 }
 
-bool AnyTensor::isDouble() const {
+bool AnyTensor::is_double() const {
   return t == TENSOR_DOUBLE;
 }
-bool AnyTensor::isSX() const {
+bool AnyTensor::is_SX() const {
   return t == TENSOR_SX;
 }
-bool AnyTensor::isMX() const {
+bool AnyTensor::is_MX() const {
   return t == TENSOR_MX;
 }
 
@@ -50,6 +50,14 @@ std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
   ret.reserve(v.size());
   for (auto &i : v) {
     ret.push_back(i);
+  }
+  return ret;
+}
+
+bool is_double(const std::vector<AnyScalar>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_double();
   }
   return ret;
 }
@@ -139,8 +147,10 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
   for (auto & i : v) {
     ret.push_back(i);
   }
-  return DT(v, {v.size()});
+  return DT(DM(ret), {v.size()});
 }
+
+
 
 /**
 AnyTensor::AnyTensor(const std::vector<AnyScalar>&v, const std::vector<int>& dim) {
@@ -151,4 +161,9 @@ AnyTensor::AnyTensor(const std::vector<AnyScalar>&v, const std::vector<int>& dim
 
 AnyTensor vertcat(const std::vector<AnyScalar> & v) {
   return AnyTensor::vertcat(v);
+}
+
+
+AnyTensor vertcat(const std::vector<double>& v) {
+  return DT(DM(v), {v.size()});
 }
