@@ -211,6 +211,12 @@ int main() {
   assert_equal(1.5, w);
 
   {
+    AnyScalar a = SX(1.5);
+    SX w = a;
+    assert_equal(1.5, w);
+  }
+  
+  {
 
     std::vector<AnyScalar> v = {2, 3};
     AnyTensor t = vertcat(v);

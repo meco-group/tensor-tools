@@ -136,6 +136,16 @@ AnyScalar::operator double() const {
   return data_double;
 }
 
+AnyScalar::operator SX() const {
+  assert(TENSOR_DOUBLE);
+  return data_sx;
+}
+
+AnyScalar::operator MX() const {
+  assert(TENSOR_SX);
+  return data_mx;
+}
+
 AnyTensor& AnyTensor::operator=(const AnyTensor& s) {
   t = s.t;
   data_double = s.data_double;
