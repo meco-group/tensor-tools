@@ -47,6 +47,8 @@ class AnyTensor {
 
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
 
+    AnyTensor outer_product(const AnyTensor &b);
+
   private:
     TensorType t;
     DT* data_double;

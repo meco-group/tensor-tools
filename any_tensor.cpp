@@ -26,6 +26,10 @@ AnyTensor AnyTensor::unity() {
   return DT(1, {});
 }
 
+AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
+  return data_double->outer_product(*b.data_double);
+}
+
 std::vector<int> AnyTensor::dims() const {
   switch(t) {
     case TENSOR_DOUBLE:
