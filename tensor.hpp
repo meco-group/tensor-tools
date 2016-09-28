@@ -42,6 +42,9 @@ class Tensor {
 
   Tensor(double a) : data_({a}), dims_({}) {
   }
+  
+  Tensor() : data_({0}), dims_({}) {
+  }
 
   ~Tensor() { }
 
