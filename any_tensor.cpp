@@ -27,7 +27,7 @@ AnyTensor AnyTensor::unity() {
 }
 
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
-  switch(t) {
+  switch (t) {
     case TENSOR_DOUBLE:
       return data_double->outer_product(*b.data_double);
       break;
@@ -41,7 +41,7 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
 }
 
 AnyTensor AnyTensor::inner(const AnyTensor &b) {
-  switch(t) {
+  switch (t) {
     case TENSOR_DOUBLE:
       return data_double->inner(*b.data_double);
       break;
@@ -55,7 +55,7 @@ AnyTensor AnyTensor::inner(const AnyTensor &b) {
 }
 
 std::vector<int> AnyTensor::dims() const {
-  switch(t) {
+  switch (t) {
     case TENSOR_DOUBLE:
       return data_double->dims();
       break;
@@ -86,10 +86,32 @@ std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
   return ret;
 }
 
+AnyScalar pow(const AnyScalar&x, int i) {
+  if (x.is_double()) return pow(x.as_double(), i);
+  if (x.is_SX()) return pow(x.as_SX(), SX(i));
+  if (x.is_MX()) return pow(x.as_MX(), MX(i));
+}
+
 bool AnyScalar::is_double(const std::vector<AnyScalar>& v) {
   bool ret = true;
   for (auto &i : v) {
     ret &= i.is_double();
+  }
+  return ret;
+}
+
+bool AnyScalar::is_SX(const std::vector<AnyScalar>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_SX();
+  }
+  return ret;
+}
+
+bool AnyScalar::is_MX(const std::vector<AnyScalar>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_MX();
   }
   return ret;
 }
@@ -211,19 +233,37 @@ AnyTensor::operator MT() const {
 }
 
 AnyTensor::~AnyTensor() {
-  if (data_double) delete data_double;
-  if (data_sx) delete data_sx;
-  if (data_mx) delete data_mx;
+  //if (data_double) delete data_double;
+  //if (data_sx) delete data_sx;
+  //if (data_mx) delete data_mx;
 }
 
 
 AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
-  std::vector<double> ret;
-  ret.reserve(v.size());
-  for (auto & i : v) {
-    ret.push_back(i);
+  if (AnyScalar::is_double(v)) {
+    std::vector<double> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i);
+    }
+    return DT(DM(ret), {v.size()});
   }
-  return DT(DM(ret), {v.size()});
+  if (AnyScalar::is_SX(v)) {
+    std::vector<SX> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i);
+    }
+    return ST(SX::vertcat(ret), {v.size()});
+  }
+  if (AnyScalar::is_MX(v)) {
+    std::vector<MX> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i);
+    }
+    return MT(MX::vertcat(ret), {v.size()});
+  }
 }
 
 
