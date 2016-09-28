@@ -48,11 +48,13 @@ class Tensor {
 
   ~Tensor() { }
 
+#ifndef SWIG
   Tensor& operator=(const Tensor& t) {
     dims_ = t.dims();
     data_ = t.data();
     return *this;
   }
+#endif
 
   const T& data() const { return data_; }
   int numel() const { return data_.numel(); }

@@ -10,7 +10,9 @@ enum TensorType {TENSOR_NULL, TENSOR_DOUBLE, TENSOR_SX, TENSOR_MX};
 class AnyScalar {
 
   public:
+#ifndef SWIG
     AnyScalar& operator=(const AnyScalar&);
+#endif
     AnyScalar(const AnyScalar& s);
     AnyScalar(double s);
     AnyScalar(const SX& s);
@@ -47,7 +49,9 @@ AnyScalar pow(const AnyScalar&x, int i);
 
 class AnyTensor {
   public:
+#ifndef SWIG
     AnyTensor& operator=(const AnyTensor&);
+#endif
     //AnyTensor(const AnyScalar& s);
     AnyTensor(const AnyTensor& s);
     //AnyTensor(const AnyTensor&, const std::vector<int>& dim);
