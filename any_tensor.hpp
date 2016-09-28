@@ -56,7 +56,6 @@ class AnyTensor {
     AnyTensor(const MT & t);
     static AnyTensor unity();
     AnyTensor();
-    ~AnyTensor();
     bool is_double() const;
     bool is_SX() const;
     bool is_MX() const;
@@ -75,9 +74,9 @@ class AnyTensor {
 
   private:
     TensorType t;
-    DT* data_double;
-    ST* data_sx;
-    MT* data_mx;
+    DT data_double;
+    ST data_sx;
+    MT data_mx;
 };
 
 

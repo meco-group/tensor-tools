@@ -29,7 +29,7 @@ AnyTensor AnyTensor::unity() {
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
   switch (t) {
     case TENSOR_DOUBLE:
-      return data_double->outer_product(*b.data_double);
+      return data_double.outer_product(b.data_double);
       break;
     case TENSOR_SX:
       //return data_sx->outer_product(*b.data_sx);
@@ -43,7 +43,7 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
 AnyTensor AnyTensor::inner(const AnyTensor &b) {
   switch (t) {
     case TENSOR_DOUBLE:
-      return data_double->inner(*b.data_double);
+      return data_double.inner(b.data_double);
       break;
     case TENSOR_SX:
       //return data_sx->inner(*b.data_sx);
@@ -57,13 +57,13 @@ AnyTensor AnyTensor::inner(const AnyTensor &b) {
 std::vector<int> AnyTensor::dims() const {
   switch (t) {
     case TENSOR_DOUBLE:
-      return data_double->dims();
+      return data_double.dims();
       break;
     case TENSOR_SX:
-      return data_sx->dims();
+      return data_sx.dims();
       break;
     case TENSOR_MX:
-      return data_mx->dims();
+      return data_mx.dims();
       break;
   }
 }
@@ -176,32 +176,23 @@ AnyTensor& AnyTensor::operator=(const AnyTensor& s) {
   return *this;
 }
 
-AnyTensor::AnyTensor(const AnyTensor& s) {
+AnyTensor::AnyTensor(const AnyTensor& s) : data_double(0), data_sx(0), data_mx(0) {
   t = s.t;
   data_double = s.data_double;
   data_sx = s.data_sx;
   data_mx = s.data_mx;
 }
 
-AnyTensor::AnyTensor(const DT & s) {
+AnyTensor::AnyTensor(const DT & s) : data_double(s), data_sx(0), data_mx(0) {
   t = TENSOR_DOUBLE;
-  data_double = new DT(s);
-  data_sx = 0;
-  data_mx = 0;
 }
 
-AnyTensor::AnyTensor(const ST & s) {
+AnyTensor::AnyTensor(const ST & s) : data_double(0), data_sx(s), data_mx(0) {
   t = TENSOR_SX;
-  data_double = 0;
-  data_sx = new ST(s);
-  data_mx = 0;
 }
 
-AnyTensor::AnyTensor(const MT & s) {
+AnyTensor::AnyTensor(const MT & s) : data_double(0), data_sx(0), data_mx(s) {
   t = TENSOR_MX;
-  data_double = 0;
-  data_sx = 0;
-  data_mx = new MT(s);
 }
 
 //AnyTensor::AnyTensor(const AnyScalar& s) {
@@ -210,32 +201,23 @@ AnyTensor::AnyTensor(const MT & s) {
 //  }
 //}
 
-AnyTensor::AnyTensor() {
+AnyTensor::AnyTensor() : data_double(0), data_sx(0), data_mx(0) {
   t = TENSOR_NULL;
-  data_double = 0;
-  data_sx = 0;
-  data_mx = 0;
 }
 
 AnyTensor::operator DT() const {
   assert(TENSOR_DOUBLE);
-  return DT(*data_double);
+  return data_double;
 }
 
 AnyTensor::operator ST() const {
   assert(TENSOR_SX);
-  return ST(*data_sx);
+  return data_sx;
 }
 
 AnyTensor::operator MT() const {
   assert(TENSOR_MX);
-  return MT(*data_mx);
-}
-
-AnyTensor::~AnyTensor() {
-  //if (data_double) delete data_double;
-  //if (data_sx) delete data_sx;
-  //if (data_mx) delete data_mx;
+  return data_mx;
 }
 
 
