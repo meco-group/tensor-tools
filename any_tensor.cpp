@@ -27,7 +27,7 @@ AnyTensor AnyTensor::unity() {
 }
 
 
-TensorType AnyTensor::merge(TensorType a, TensorType b) {
+TensorType AnyScalar::merge(TensorType a, TensorType b) {
   
   if (a == TENSOR_SX && b == TENSOR_MX) assert(0);
   if (a == TENSOR_MX && b == TENSOR_SX) assert(0);
