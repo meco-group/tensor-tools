@@ -166,17 +166,17 @@ AnyScalar::AnyScalar() {
 }
 
 AnyScalar::operator double() const {
-  assert(TENSOR_DOUBLE);
+  assert(t==TENSOR_DOUBLE);
   return data_double;
 }
 
 AnyScalar::operator SX() const {
-  assert(TENSOR_DOUBLE);
+  assert(t==TENSOR_DOUBLE);
   return data_sx;
 }
 
 AnyScalar::operator MX() const {
-  assert(TENSOR_SX);
+  assert(t==TENSOR_SX);
   return data_mx;
 }
 
@@ -218,17 +218,19 @@ AnyTensor::AnyTensor() : data_double(0), data_sx(0), data_mx(0) {
 }
 
 AnyTensor::operator DT() const {
-  assert(TENSOR_DOUBLE);
+  assert(t==TENSOR_DOUBLE);
   return data_double;
 }
 
 AnyTensor::operator ST() const {
-  assert(TENSOR_SX);
+  if (t==TENSOR_DOUBLE) return ST(data_double);
+  assert(t==TENSOR_SX);
   return data_sx;
 }
 
 AnyTensor::operator MT() const {
-  assert(TENSOR_MX);
+  if (t==TENSOR_DOUBLE) return MT(data_double);
+  assert(t==TENSOR_MX);
   return data_mx;
 }
 

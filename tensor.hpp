@@ -34,7 +34,8 @@ class Tensor {
   public:
 
   template<class S>
-  Tensor(const Tensor<S>& a) : data_(T(a.data)), dims_(a.dims) {
+  Tensor(const Tensor<S>& a) : data_(T(a.data())), dims_(a.dims()) {
+  
   }
   
   Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {

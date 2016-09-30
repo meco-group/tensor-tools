@@ -63,6 +63,9 @@ class AnyTensor {
     bool is_double() const;
     bool is_SX() const;
     bool is_MX() const;
+    DT as_double() const { return this->operator DT();}
+    ST as_SX() const { return this->operator ST();}
+    MT as_MX() const { return this->operator MT();}
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
 
