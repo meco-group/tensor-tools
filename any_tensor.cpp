@@ -41,13 +41,13 @@ TensorType merge(TensorType a, TensorType b) {
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
   switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
-      return data_double.outer_product(b.data_double);
+      return DT(data_double).outer_product(DT(b.data_double));
       break;
     case TENSOR_SX:
-      return data_sx.outer_product(b.data_sx);
+      return ST(data_sx).outer_product(ST(b.data_sx));
       break;
     case TENSOR_MX:
-      return data_mx.outer_product(b.data_mx);
+      return MT(data_mx).outer_product(MT(b.data_mx));
       break;
   }
 }
@@ -55,13 +55,13 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
 AnyTensor AnyTensor::inner(const AnyTensor &b) {
   switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
-      return data_double.inner(b.data_double);
+      return DT(data_double).inner(DT(b.data_double));
       break;
     case TENSOR_SX:
-      return data_sx.inner(b.data_sx);
+      return ST(data_sx).inner(ST(b.data_sx));
       break;
     case TENSOR_MX:
-      return data_mx.inner(b.data_mx);
+      return MT(data_mx).inner(MT(b.data_mx));
       break;
   }
 }
