@@ -26,30 +26,42 @@ AnyTensor AnyTensor::unity() {
   return DT(1, {});
 }
 
+
+TensorType merge(TensorType a, TensorType b) {
+  
+  if (a == TENSOR_SX && b == TENSOR_MX) assert(0);
+  if (a == TENSOR_MX && b == TENSOR_SX) assert(0);
+  if (a == TENSOR_SX || b == TENSOR_SX) return TENSOR_SX;
+  if (a == TENSOR_MX || b == TENSOR_MX) return TENSOR_MX;
+  
+  return TENSOR_DOUBLE;  
+}
+
+
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
-  switch (t) {
+  switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
       return data_double.outer_product(b.data_double);
       break;
     case TENSOR_SX:
-      //return data_sx->outer_product(*b.data_sx);
+      return data_sx.outer_product(b.data_sx);
       break;
     case TENSOR_MX:
-      //return data_mx->outer_product(*b.mx);
+      return data_mx.outer_product(b.data_mx);
       break;
   }
 }
 
 AnyTensor AnyTensor::inner(const AnyTensor &b) {
-  switch (t) {
+  switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
       return data_double.inner(b.data_double);
       break;
     case TENSOR_SX:
-      //return data_sx->inner(*b.data_sx);
+      return data_sx.inner(b.data_sx);
       break;
     case TENSOR_MX:
-      //return data_mx->inner(*b.mx);
+      return data_mx.inner(b.data_mx);
       break;
   }
 }

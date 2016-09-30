@@ -36,7 +36,7 @@ class AnyScalar {
     static bool is_double(const std::vector<AnyScalar>& v);
     static bool is_SX(const std::vector<AnyScalar>& v);
     static bool is_MX(const std::vector<AnyScalar>& v);
-
+    static TensorType merge(TensorType a, TensorType b);
 
   private:
     TensorType t;
