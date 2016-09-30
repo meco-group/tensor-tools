@@ -171,12 +171,12 @@ AnyScalar::operator double() const {
 }
 
 AnyScalar::operator SX() const {
-  assert(t==TENSOR_DOUBLE);
+  assert(t==TENSOR_SX);
   return data_sx;
 }
 
 AnyScalar::operator MX() const {
-  assert(t==TENSOR_SX);
+  assert(t==TENSOR_MX);
   return data_mx;
 }
 
