@@ -28,15 +28,32 @@ AnyTensor AnyTensor::unity() {
 
 
 TensorType AnyScalar::merge(TensorType a, TensorType b) {
-  
+
   if (a == TENSOR_SX && b == TENSOR_MX) assert(0);
   if (a == TENSOR_MX && b == TENSOR_SX) assert(0);
   if (a == TENSOR_SX || b == TENSOR_SX) return TENSOR_SX;
   if (a == TENSOR_MX || b == TENSOR_MX) return TENSOR_MX;
-  
-  return TENSOR_DOUBLE;  
+
+  return TENSOR_DOUBLE;
 }
 
+
+AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
+  AnyScalar ret;
+  switch (AnyScalar::merge(t, rhs.t)) {
+    case TENSOR_DOUBLE:
+      ret = as_double()+rhs.as_double();
+      break;
+    case TENSOR_SX:
+      ret = as_SX()+rhs.as_SX();
+      break;
+    case TENSOR_MX:
+      ret = as_MX()+rhs.as_MX();
+      break;
+  }
+
+  return this->operator=(ret);
+}
 
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
   switch (AnyScalar::merge(t, b.t)) {
@@ -171,11 +188,13 @@ AnyScalar::operator double() const {
 }
 
 AnyScalar::operator SX() const {
+  if (t==TENSOR_DOUBLE) return SX(data_double);
   assert(t==TENSOR_SX);
   return data_sx;
 }
 
 AnyScalar::operator MX() const {
+  if (t==TENSOR_DOUBLE) return MX(data_double);
   assert(t==TENSOR_MX);
   return data_mx;
 }

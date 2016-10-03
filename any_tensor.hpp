@@ -38,6 +38,9 @@ class AnyScalar {
     static bool is_MX(const std::vector<AnyScalar>& v);
     static TensorType merge(TensorType a, TensorType b);
 
+
+    AnyScalar& operator+=(const AnyScalar& rhs);
+
   private:
     TensorType t;
     double data_double;
