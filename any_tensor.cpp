@@ -55,6 +55,7 @@ AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
   return this->operator=(ret);
 }
 
+
 AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
   switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
@@ -110,7 +111,7 @@ std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
   std::vector<double> ret;
   ret.reserve(v.size());
   for (auto &i : v) {
-    ret.push_back(i);
+    ret.push_back(i.as_double());
   }
   return ret;
 }
@@ -259,7 +260,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     std::vector<double> ret;
     ret.reserve(v.size());
     for (auto & i : v) {
-      ret.push_back(i);
+      ret.push_back(i.as_double());
     }
     return DT(DM(ret), {v.size()});
   }
@@ -267,7 +268,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     std::vector<SX> ret;
     ret.reserve(v.size());
     for (auto & i : v) {
-      ret.push_back(i);
+      ret.push_back(i.as_SX());
     }
     return ST(SX::vertcat(ret), {v.size()});
   }
@@ -275,7 +276,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     std::vector<MX> ret;
     ret.reserve(v.size());
     for (auto & i : v) {
-      ret.push_back(i);
+      ret.push_back(i.as_MX());
     }
     return MT(MX::vertcat(ret), {v.size()});
   }

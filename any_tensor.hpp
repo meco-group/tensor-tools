@@ -20,9 +20,9 @@ class AnyScalar {
     AnyScalar();
 
 #ifndef SWIG
-    operator double() const;
-    operator SX() const;
-    operator MX() const;
+    explicit operator double() const;
+    explicit operator SX() const;
+    explicit operator MX() const;
 #endif
 
     double as_double() const { return this->operator double();}
@@ -38,6 +38,47 @@ class AnyScalar {
     static bool is_MX(const std::vector<AnyScalar>& v);
     static TensorType merge(TensorType a, TensorType b);
 
+#define ANYSCALAR_BINARY(OP) \
+switch (AnyScalar::merge(x.t, y.t)) { \
+  case TENSOR_DOUBLE: \
+    return x.as_double() OP y.as_double();break; \
+  case TENSOR_SX: \
+    return x.as_SX() OP y.as_SX();break; \
+    break; \
+  case TENSOR_MX: \
+    return x.as_MX() OP y.as_MX();break; \
+    break;\
+}
+
+    /// Logic greater or equal to
+    friend inline AnyScalar operator>=(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(>=)
+    }
+
+    friend inline AnyScalar operator<(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(<)
+    }
+    friend inline AnyScalar operator>(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(>)
+    }
+    friend inline AnyScalar operator<=(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(<=)
+    }
+    friend inline AnyScalar operator-(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(-)
+    }
+    friend inline AnyScalar operator*(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(*)
+    }
+    friend inline AnyScalar operator/(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(/)
+    }
+    friend inline AnyScalar operator==(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(==)
+    }
+    friend inline AnyScalar operator&&(const AnyScalar &x, const AnyScalar &y) {
+      ANYSCALAR_BINARY(&&)
+    }
 
     AnyScalar& operator+=(const AnyScalar& rhs);
 
