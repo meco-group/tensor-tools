@@ -114,9 +114,9 @@ class AnyTensor {
     //bool equals(const AnyTensor&rhs) const;
 
 #ifndef SWIG
-    operator DT() const;
-    operator ST() const;
-    operator MT() const;
+    explicit operator DT() const;
+    explicit operator ST() const;
+    explicit operator MT() const;
 #endif
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
 
