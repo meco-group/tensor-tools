@@ -262,7 +262,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     for (auto & i : v) {
       ret.push_back(i.as_double());
     }
-    return DT(DM(ret), {v.size()});
+    return DT(DM(ret), {static_cast<int>(v.size())});
   }
   if (AnyScalar::is_SX(v)) {
     std::vector<SX> ret;
@@ -270,7 +270,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     for (auto & i : v) {
       ret.push_back(i.as_SX());
     }
-    return ST(SX::vertcat(ret), {v.size()});
+    return ST(SX::vertcat(ret), {static_cast<int>(v.size())});
   }
   if (AnyScalar::is_MX(v)) {
     std::vector<MX> ret;
@@ -278,7 +278,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     for (auto & i : v) {
       ret.push_back(i.as_MX());
     }
-    return MT(MX::vertcat(ret), {v.size()});
+    return MT(MX::vertcat(ret), {static_cast<int>(v.size())});
   }
 }
 
@@ -297,5 +297,5 @@ AnyTensor vertcat(const std::vector<AnyScalar> & v) {
 
 
 AnyTensor vertcat(const std::vector<double>& v) {
-  return DT(DM(v), {v.size()});
+  return DT(DM(v), {static_cast<int>(v.size())});
 }
