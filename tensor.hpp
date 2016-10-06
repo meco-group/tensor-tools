@@ -61,7 +61,7 @@ class Tensor {
   }
 #endif
 
-  const T& data() const { return data_; }
+  T data() const { return data_; }
   int numel() const { return data_.numel(); }
 
   static std::pair<int, int> normalize_dim(const std::vector<int> & dims);
