@@ -44,10 +44,10 @@ switch (AnyScalar::merge(x.t, y.t)) { \
     return x.as_double() OP y.as_double();break; \
   case TENSOR_SX: \
     return x.as_SX() OP y.as_SX();break; \
-    break; \
   case TENSOR_MX: \
     return x.as_MX() OP y.as_MX();break; \
-    break;\
+  default:\
+     assert(false); \
 }
 
     /// Logic greater or equal to
