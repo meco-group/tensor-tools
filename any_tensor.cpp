@@ -50,6 +50,7 @@ AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
     case TENSOR_MX:
       ret = as_MX()+rhs.as_MX();
       break;
+    default: assert(false);
   }
 
   return this->operator=(ret);
@@ -67,6 +68,7 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
     case TENSOR_MX:
       return as_MT().outer_product(b.as_MT());
       break;
+    default: assert(false);
   }
 }
 
@@ -81,6 +83,7 @@ AnyTensor AnyTensor::inner(const AnyTensor &b) {
     case TENSOR_MX:
       return as_MT().inner(b.as_MT());
       break;
+    default: assert(false);
   }
 }
 
@@ -95,6 +98,7 @@ std::vector<int> AnyTensor::dims() const {
     case TENSOR_MX:
       return data_mx.dims();
       break;
+    default: assert(false);
   }
 }
 
@@ -120,6 +124,7 @@ AnyScalar pow(const AnyScalar&x, int i) {
   if (x.is_double()) return pow(x.as_double(), i);
   if (x.is_SX()) return pow(x.as_SX(), SX(i));
   if (x.is_MX()) return pow(x.as_MX(), MX(i));
+  assert(false);
 }
 
 bool AnyScalar::is_double(const std::vector<AnyScalar>& v) {
@@ -280,6 +285,7 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     }
     return MT(MX::vertcat(ret), {static_cast<int>(v.size())});
   }
+  assert(false);
 }
 
 

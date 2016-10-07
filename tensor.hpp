@@ -73,7 +73,6 @@ class Tensor {
 
   static std::vector<int> sub2ind(const std::vector<int>& dims, int sub) {
     std::vector<int> ret(dims.size());
-    int cumprod = 1;
     for (int i=0;i<dims.size();i++) {
       ret[i] = sub % dims[i];
       sub/= dims[i];
@@ -366,6 +365,8 @@ std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
         prod*= dims[i];
       }
       return {dims[0], prod};
+    } else {
+      assert(false);
     }
 }
 
