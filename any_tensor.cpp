@@ -1,6 +1,10 @@
 #include "any_tensor.hpp"
 
-
+int product(const std::vector<int>& a) {
+  int r = 1;
+  for (int i=0;i<a.size();++i) r*=a[i];
+  return r;
+}
 
 bool AnyScalar::is_double() const {
   return t == TENSOR_DOUBLE;

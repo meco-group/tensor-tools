@@ -6,6 +6,7 @@
 #include <ctime>
 #include <assert.h>
 #include <casadi/casadi.hpp>
+#include "tensor_exception.hpp"
 
 using namespace casadi;
 using namespace std;
@@ -29,6 +30,10 @@ std::vector<T> mrange(T start, T stop) {
   return range(-start-1, -stop-1, -1);
 }
 
+#ifndef SWIG
+int product(const std::vector<int>& a);
+#endif
+
 template <class T>
 class Tensor {
   public:
@@ -39,7 +44,8 @@ class Tensor {
   }
   
   Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {
-    assert(data.is_dense());
+    tensor_assert(data.is_dense());
+    tensor_assert(data.numel()==product(dims));
   }
 
   Tensor(const Tensor& t) : data_(t.data()), dims_(t.dims()) {
@@ -62,12 +68,32 @@ class Tensor {
 #endif
 
   T data() const { return data_; }
+  T matrix() const {
+    tensor_assert(n_dims()<=2);
+    if (n_dims()==0) {
+      return reshape(data_, std::pair<int,int>{1, 1});
+    } else if (n_dims()==1) {
+      return reshape(data_, std::pair<int,int>{dims_[0], 1});
+    } else if (n_dims()==2) {
+      return reshape(data_, std::pair<int,int>{dims_[0], dims_[1]});
+    }
+  }
+  Tensor squeeze() const {
+    std::vector<int> dims;
+    for (int i=0;i<n_dims();++i) {
+      if (dims_[i]!=1) dims.push_back(dims_[i]);
+    }
+    return Tensor(data_, dims);
+  }
+  Tensor shape(const std::vector<int>& dims) const {
+    return Tensor(data_, dims);
+  }
   int numel() const { return data_.numel(); }
 
   static std::pair<int, int> normalize_dim(const std::vector<int> & dims);
 
   static void assert_match_dim(const std::vector<int>& a, const std::vector<int>& b) {
-    assert(a==b);
+    tensor_assert(a==b);
 
   }
 
@@ -80,7 +106,7 @@ class Tensor {
     return ret;
   }
   static int ind2sub(const std::vector<int>& dims, const std::vector<int>& ind) {
-    assert(dims.size()==ind.size());
+    tensor_assert(dims.size()==ind.size());
     int ret=0;
     int cumprod = 1;
     for (int i=0;i<dims.size();i++) {
@@ -123,8 +149,13 @@ class Tensor {
   *   -1  indicates a slice
   */
   Tensor operator()(const std::vector<int>& ind) const {
+    return index(ind);
+  }
+  
+  
+  Tensor index(const std::vector<int>& ind) const {
     // Check that input is a permutation of range(n_dims())
-    assert(ind.size()==n_dims());
+    tensor_assert(ind.size()==n_dims());
 
     std::vector<int> slice_dims;
 
@@ -135,8 +166,8 @@ class Tensor {
         slice_dims.push_back(dims(i));
         slice_location.push_back(i);
       } else {
-        assert(ind[i]>=0);
-        assert(ind[i]<dims(i));
+        tensor_assert(ind[i]>=0);
+        tensor_assert(ind[i]<dims(i));
       }
     }
 
@@ -160,18 +191,18 @@ class Tensor {
   */
   Tensor reorder_dims(const std::vector<int>& order) const {
     // Check that input is a permutaion of range(n_dims())
-    assert(order.size()==n_dims());
+    tensor_assert(order.size()==n_dims());
 
     std::vector<bool> occured(n_dims(), false);
 
     for (int i : order) {
-      assert(i>=0);
-      assert(i<n_dims());
+      tensor_assert(i>=0);
+      tensor_assert(i<n_dims());
       occured[i] = true;
     }
 
     for (bool occ : occured) {
-      assert(occ);
+      tensor_assert(occ);
     }
 
     std::vector<int> ind(order.size());
@@ -204,10 +235,10 @@ class Tensor {
     const Tensor& A = *this;
 
     // Dimension check
-    assert(A.n_dims()==a.size());
-    assert(B.n_dims()==b.size());
+    tensor_assert(A.n_dims()==a.size());
+    tensor_assert(B.n_dims()==b.size());
 
-    assert(c.size()<=a.size()+b.size());
+    tensor_assert(c.size()<=a.size()+b.size());
 
     std::map<int, int> dim_map;
 
@@ -219,7 +250,7 @@ class Tensor {
       if (al==dim_map.end()) {
         dim_map[ai] = A.dims(i);
       } else {
-        assert(al->second==A.dims(i));
+        tensor_assert(al->second==A.dims(i));
       }
     }
 
@@ -230,16 +261,16 @@ class Tensor {
       if (bl==dim_map.end()) {
         dim_map[bi] = B.dims(i);
       } else {
-        assert(bl->second==B.dims(i));
+        tensor_assert(bl->second==B.dims(i));
       }
     }
 
     std::vector<int> new_dims;
     for (int i=0;i<c.size();++i) {
       int ci = c[i];
-      assert(ci<0);
+      tensor_assert(ci<0);
       auto cl = dim_map.find(ci);
-      assert(cl!=dim_map.end());
+      tensor_assert(cl!=dim_map.end());
       new_dims.push_back(dim_map[ci]);
     }
 
@@ -312,16 +343,16 @@ class Tensor {
 
     const Tensor& a = *this;
 
-    assert(b.n_dims()>=2);
-    assert(a.n_dims()>=2);
+    tensor_assert(b.n_dims()>=2);
+    tensor_assert(a.n_dims()>=2);
 
     bool fixed = (a.n_dims()==2);
 
     if (!fixed) {
-      for (int i=2;i<a.n_dims();i++) assert(a.dims(i)==b.dims(i));
+      for (int i=2;i<a.n_dims();i++) tensor_assert(a.dims(i)==b.dims(i));
     }
 
-    assert(b.dims(1)==a.dims(0));
+    tensor_assert(b.dims(1)==a.dims(0));
 
     std::vector<int> a_r;
     if (fixed) {
@@ -345,6 +376,12 @@ class Tensor {
             << obj.dims() << "): " << obj.data();
       }
   #endif // SWIG
+  
+  std::string getRepresentation() const {
+    std::stringstream ss;
+    ss << (*this);
+    return ss.str();
+  }
 
   private:
     T data_;
@@ -366,7 +403,7 @@ std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
       }
       return {dims[0], prod};
     } else {
-      assert(false);
+      tensor_assert(false);
     }
 }
 
