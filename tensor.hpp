@@ -72,6 +72,10 @@ class Tensor {
     tensor_assert(data.numel()==product(dims));
   }
 
+  Tensor(const T& data) : data_(data), dims_({data.size1(),data.size2()}) {
+    tensor_assert(data.is_dense());
+  }
+
   Tensor(const Tensor& t) : data_(t.data()), dims_(t.dims()) {
   }
 
@@ -156,6 +160,10 @@ class Tensor {
   static Tensor sym(const std::string& name, const std::vector<int> & dims) {
     T v = T::sym(name, normalize_dim(dims));
     return Tensor<T>(v, dims);
+  }
+
+  static Tensor solve(const Tensor& A, const Tensor& B) {
+    return T::solve(A.matrix(),B.matrix(), "lapacklu", Dict());
   }
 
   Tensor operator+(const Tensor& rhs) const {

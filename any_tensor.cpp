@@ -31,6 +31,22 @@ AnyTensor AnyTensor::unity() {
 }
 
 
+AnyTensor AnyTensor::reorder_dims(const std::vector<int>& order) const {
+  if (is_double()) return as_DT().reorder_dims(order);
+  if (is_SX()) return as_ST().reorder_dims(order);
+  if (is_MX()) return as_MT().reorder_dims(order);
+  tensor_assert(false);
+  return DT();
+}
+AnyTensor AnyTensor::shape(const std::vector<int>& dims) const {
+  if (is_double()) return as_DT().shape(dims);
+  if (is_SX()) return as_ST().shape(dims);
+  if (is_MX()) return as_MT().shape(dims);
+  tensor_assert(false);
+  return DT();
+}
+    
+    
 TensorType AnyScalar::merge(TensorType a, TensorType b) {
 
   if (a == TENSOR_SX && b == TENSOR_MX) tensor_assert(0);
@@ -58,6 +74,24 @@ AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
   }
 
   return this->operator=(ret);
+}
+
+AnyTensor AnyTensor::solve(const AnyTensor& A, const AnyTensor& B) {
+  AnyTensor ret;
+  switch (AnyScalar::merge(A.t, B.t)) {
+    case TENSOR_DOUBLE:
+      ret = solve(A.as_DT(),B.as_DT());
+      break;
+    case TENSOR_SX:
+      ret = solve(A.as_ST(),B.as_ST());
+      break;
+    case TENSOR_MX:
+      ret = solve(A.as_MT(),B.as_MT());
+      break;
+    default: tensor_assert(false);
+  }
+
+  return ret;
 }
 
 

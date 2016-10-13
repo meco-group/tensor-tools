@@ -115,6 +115,8 @@ class AnyTensor {
     static bool is_MT(const std::vector<AnyTensor>& v);
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
+    
+    static AnyTensor solve(const AnyTensor& A, const AnyTensor& B);
 
 #ifndef SWIG
     explicit operator DT() const;
@@ -126,6 +128,9 @@ class AnyTensor {
     
     static AnyTensor pack(const std::vector<AnyTensor>& v, int axis);
     static std::vector<AnyTensor> unpack(const AnyTensor& v, int axis);
+    
+    AnyTensor reorder_dims(const std::vector<int>& order) const;
+    AnyTensor shape(const std::vector<int>& dims) const;
     
     AnyTensor outer_product(const AnyTensor &b);
     AnyTensor inner(const AnyTensor&b);
