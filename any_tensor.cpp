@@ -33,8 +33,8 @@ AnyTensor AnyTensor::unity() {
 
 TensorType AnyScalar::merge(TensorType a, TensorType b) {
 
-  if (a == TENSOR_SX && b == TENSOR_MX) assert(0);
-  if (a == TENSOR_MX && b == TENSOR_SX) assert(0);
+  if (a == TENSOR_SX && b == TENSOR_MX) tensor_assert(0);
+  if (a == TENSOR_MX && b == TENSOR_SX) tensor_assert(0);
   if (a == TENSOR_SX || b == TENSOR_SX) return TENSOR_SX;
   if (a == TENSOR_MX || b == TENSOR_MX) return TENSOR_MX;
 
@@ -54,7 +54,7 @@ AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
     case TENSOR_MX:
       ret = as_MX()+rhs.as_MX();
       break;
-    default: assert(false);
+    default: tensor_assert(false);
   }
 
   return this->operator=(ret);
@@ -72,8 +72,9 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
     case TENSOR_MX:
       return as_MT().outer_product(b.as_MT());
       break;
-    default: assert(false);
+    default: tensor_assert(false);
   }
+  return DT();
 }
 
 AnyTensor AnyTensor::inner(const AnyTensor &b) {
@@ -87,8 +88,9 @@ AnyTensor AnyTensor::inner(const AnyTensor &b) {
     case TENSOR_MX:
       return as_MT().inner(b.as_MT());
       break;
-    default: assert(false);
+    default: tensor_assert(false);
   }
+  return DT();
 }
 
 std::vector<int> AnyTensor::dims() const {
@@ -102,8 +104,9 @@ std::vector<int> AnyTensor::dims() const {
     case TENSOR_MX:
       return data_mx.dims();
       break;
-    default: assert(false);
+    default: tensor_assert(false);
   }
+  return {};
 }
 
 /**bool AnyTensor::equals(const AnyTensor& rhs) const {
@@ -128,7 +131,8 @@ AnyScalar pow(const AnyScalar&x, int i) {
   if (x.is_double()) return pow(x.as_double(), i);
   if (x.is_SX()) return pow(x.as_SX(), SX(i));
   if (x.is_MX()) return pow(x.as_MX(), MX(i));
-  assert(false);
+  tensor_assert(false);
+  return 0;
 }
 
 bool AnyScalar::is_double(const std::vector<AnyScalar>& v) {
@@ -148,6 +152,30 @@ bool AnyScalar::is_SX(const std::vector<AnyScalar>& v) {
 }
 
 bool AnyScalar::is_MX(const std::vector<AnyScalar>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_MX();
+  }
+  return ret;
+}
+
+bool AnyTensor::is_DT(const std::vector<AnyTensor>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_double();
+  }
+  return ret;
+}
+
+bool AnyTensor::is_ST(const std::vector<AnyTensor>& v) {
+  bool ret = true;
+  for (auto &i : v) {
+    ret &= i.is_SX();
+  }
+  return ret;
+}
+
+bool AnyTensor::is_MT(const std::vector<AnyTensor>& v) {
   bool ret = true;
   for (auto &i : v) {
     ret &= i.is_MX();
@@ -193,19 +221,19 @@ AnyScalar::AnyScalar() {
 }
 
 AnyScalar::operator double() const {
-  assert(t==TENSOR_DOUBLE);
+  tensor_assert(t==TENSOR_DOUBLE);
   return data_double;
 }
 
 AnyScalar::operator SX() const {
   if (t==TENSOR_DOUBLE) return SX(data_double);
-  assert(t==TENSOR_SX);
+  tensor_assert(t==TENSOR_SX);
   return data_sx;
 }
 
 AnyScalar::operator MX() const {
   if (t==TENSOR_DOUBLE) return MX(data_double);
-  assert(t==TENSOR_MX);
+  tensor_assert(t==TENSOR_MX);
   return data_mx;
 }
 
@@ -247,23 +275,63 @@ AnyTensor::AnyTensor() : data_double(0), data_sx(0), data_mx(0) {
 }
 
 AnyTensor::operator DT() const {
-  assert(t==TENSOR_DOUBLE);
+  tensor_assert(t==TENSOR_DOUBLE);
   return data_double;
 }
 
 AnyTensor::operator ST() const {
   if (t==TENSOR_DOUBLE) return ST(data_double);
-  assert(t==TENSOR_SX);
+  tensor_assert(t==TENSOR_SX);
   return data_sx;
 }
 
 AnyTensor::operator MT() const {
   if (t==TENSOR_DOUBLE) return MT(data_double);
-  assert(t==TENSOR_MX);
+  tensor_assert(t==TENSOR_MX);
   return data_mx;
 }
 
 
+AnyTensor AnyTensor::concat(const std::vector<AnyTensor>& v, int axis) {
+  tensor_assert_message(false, "Not implemented");
+  return DT();
+}
+    
+AnyTensor AnyTensor::pack(const std::vector<AnyTensor>& v, int axis) {
+  if (AnyTensor::is_DT(v)) {
+    std::vector<DT> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i.as_DT());
+    }
+    return DT::pack(ret, axis);
+  }
+  if (AnyTensor::is_ST(v)) {
+    std::vector<ST> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i.as_ST());
+    }
+    return ST::pack(ret, axis);
+  }
+  if (AnyTensor::is_MT(v)) {
+    std::vector<MT> ret;
+    ret.reserve(v.size());
+    for (auto & i : v) {
+      ret.push_back(i.as_MT());
+    }
+    return MT::pack(ret, axis);
+  }
+  tensor_assert(false);
+  return DT();
+}
+
+std::vector<AnyTensor> unpack(const AnyTensor& v, int axis) {
+  tensor_assert_message(false, "Not implemented yet");
+  return {DT()};
+}
+    
+    
 AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
   if (AnyScalar::is_double(v)) {
     std::vector<double> ret;
@@ -289,8 +357,10 @@ AnyTensor AnyTensor::vertcat(const std::vector<AnyScalar>& v) {
     }
     return MT(MX::vertcat(ret), {static_cast<int>(v.size())});
   }
-  assert(false);
+  tensor_assert(false);
+  return DT();
 }
+
 
 
 
@@ -303,6 +373,10 @@ AnyTensor::AnyTensor(const std::vector<AnyScalar>&v, const std::vector<int>& dim
 
 AnyTensor vertcat(const std::vector<AnyScalar> & v) {
   return AnyTensor::vertcat(v);
+}
+
+AnyTensor concat(const std::vector<AnyTensor> & v, int axis) {
+  return AnyTensor::concat(v, axis);
 }
 
 

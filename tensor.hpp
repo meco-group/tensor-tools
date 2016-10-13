@@ -30,6 +30,7 @@ std::vector<T> mrange(T start, T stop) {
   return range(-start-1, -stop-1, -1);
 }
 
+
 #ifndef SWIG
 int product(const std::vector<int>& a);
 #endif
@@ -41,6 +42,29 @@ class Tensor {
   template<class S>
   Tensor(const Tensor<S>& a) : data_(T(a.data())), dims_(a.dims()) {
   
+  }
+  
+  static Tensor<T> concat(const std::vector< Tensor<T> >& v) {
+    tensor_assert_message(false,"Not implemented");
+  }
+  
+  static Tensor<T> pack(const std::vector< Tensor<T> >& v, int axis) {
+    auto dims = v[0].dims();
+    
+    std::vector<T> data;
+    
+    for (auto& t : v) {
+      tensor_assert(dims==t.dims());
+      data.push_back(t.data());
+    }
+    
+    std::vector<int> new_dims = dims;
+    new_dims.insert(new_dims.begin(), v.size());
+    Tensor<T> ret = Tensor(veccat(data), new_dims);
+    
+    if (axis!=0) tensor_assert_message(false,"Not implemented");
+    return ret;
+    
   }
   
   Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {
@@ -405,6 +429,7 @@ std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
     } else {
       tensor_assert(false);
     }
+    return {0,0};
 }
 
 typedef Tensor<SX> ST;

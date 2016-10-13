@@ -110,6 +110,9 @@ class AnyTensor {
     DT as_DT() const { return this->operator DT();}
     ST as_ST() const { return this->operator ST();}
     MT as_MT() const { return this->operator MT();}
+    static bool is_DT(const std::vector<AnyTensor>& v);
+    static bool is_ST(const std::vector<AnyTensor>& v);
+    static bool is_MT(const std::vector<AnyTensor>& v);
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
 
@@ -119,7 +122,11 @@ class AnyTensor {
     explicit operator MT() const;
 #endif
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
-
+    static AnyTensor concat(const std::vector<AnyTensor>& v, int axis);
+    
+    static AnyTensor pack(const std::vector<AnyTensor>& v, int axis);
+    static std::vector<AnyTensor> unpack(const AnyTensor& v, int axis);
+    
     AnyTensor outer_product(const AnyTensor &b);
     AnyTensor inner(const AnyTensor&b);
 
