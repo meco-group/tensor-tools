@@ -32,13 +32,10 @@ class AnyScalar {
     bool is_double() const;
     bool is_SX() const;
     bool is_MX() const;
-    static std::vector<double> vector_double(const std::vector<AnyScalar>& v);
+
     static std::vector<double> as_double(const std::vector<AnyScalar>& v);
     static std::vector<SX> as_SX(const std::vector<AnyScalar>& v);
     static std::vector<MX> as_MX(const std::vector<AnyScalar>& v);
-    static bool is_double(const std::vector<AnyScalar>& v);
-    static bool is_SX(const std::vector<AnyScalar>& v);
-    static bool is_MX(const std::vector<AnyScalar>& v);
     static TensorType merge(TensorType a, TensorType b);
 
 #define ANYSCALAR_BINARY(OP) \
@@ -50,7 +47,7 @@ switch (AnyScalar::merge(x.t, y.t)) { \
   case TENSOR_MX: \
     return x.as_MX() OP y.as_MX();break; \
   default:\
-     assert(false); \
+     assert(false); return 0;\
 }
 
     /// Logic greater or equal to
@@ -86,6 +83,9 @@ switch (AnyScalar::merge(x.t, y.t)) { \
     AnyScalar& operator+=(const AnyScalar& rhs);
 
     static TensorType type(const std::vector<AnyScalar>& v);
+    static bool is_double(const std::vector<AnyScalar>& v) {return type(v)==TENSOR_DOUBLE;}
+    static bool is_SX(const std::vector<AnyScalar>& v) {return type(v)==TENSOR_SX;}
+    static bool is_MX(const std::vector<AnyScalar>& v) {return type(v)==TENSOR_MX;}
 
   private:
     TensorType t;
@@ -115,12 +115,12 @@ class AnyTensor {
     DT as_DT() const { return this->operator DT();}
     ST as_ST() const { return this->operator ST();}
     MT as_MT() const { return this->operator MT();}
-    static bool is_DT(const std::vector<AnyTensor>& v);
-    static bool is_ST(const std::vector<AnyTensor>& v);
-    static bool is_MT(const std::vector<AnyTensor>& v);
     static std::vector<DT> as_DT(const std::vector<AnyTensor>& v);
     static std::vector<ST> as_ST(const std::vector<AnyTensor>& v);
     static std::vector<MT> as_MT(const std::vector<AnyTensor>& v);
+    static bool is_DT(const std::vector<AnyTensor>& v) {return type(v)==TENSOR_DOUBLE;}
+    static bool is_ST(const std::vector<AnyTensor>& v) {return type(v)==TENSOR_SX;}
+    static bool is_MT(const std::vector<AnyTensor>& v) {return type(v)==TENSOR_MX;}
 
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;

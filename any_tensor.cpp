@@ -108,13 +108,10 @@ AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
   switch (AnyScalar::merge(t, b.t)) {
     case TENSOR_DOUBLE:
       return data_double.outer_product(b.data_double);
-      break;
     case TENSOR_SX:
       return as_ST().outer_product(b.as_ST());
-      break;
     case TENSOR_MX:
       return as_MT().outer_product(b.as_MT());
-      break;
     default: tensor_assert(false);
   }
   return DT();
@@ -161,69 +158,12 @@ std::vector<int> AnyTensor::dims() const {
   return false;
 }*/
 
-std::vector<double> AnyScalar::vector_double(const std::vector<AnyScalar>& v) {
-  std::vector<double> ret;
-  ret.reserve(v.size());
-  for (auto &i : v) {
-    ret.push_back(i.as_double());
-  }
-  return ret;
-}
-
 AnyScalar pow(const AnyScalar&x, int i) {
   if (x.is_double()) return pow(x.as_double(), i);
   if (x.is_SX()) return pow(x.as_SX(), SX(i));
   if (x.is_MX()) return pow(x.as_MX(), MX(i));
   tensor_assert(false);
   return 0;
-}
-
-bool AnyScalar::is_double(const std::vector<AnyScalar>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_double();
-  }
-  return ret;
-}
-
-bool AnyScalar::is_SX(const std::vector<AnyScalar>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_SX();
-  }
-  return ret;
-}
-
-bool AnyScalar::is_MX(const std::vector<AnyScalar>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_MX();
-  }
-  return ret;
-}
-
-bool AnyTensor::is_DT(const std::vector<AnyTensor>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_DT();
-  }
-  return ret;
-}
-
-bool AnyTensor::is_ST(const std::vector<AnyTensor>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_ST();
-  }
-  return ret;
-}
-
-bool AnyTensor::is_MT(const std::vector<AnyTensor>& v) {
-  bool ret = true;
-  for (auto &i : v) {
-    ret &= i.is_MT();
-  }
-  return ret;
 }
 
 AnyScalar::AnyScalar(const AnyScalar& s) {
