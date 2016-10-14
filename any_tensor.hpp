@@ -33,6 +33,9 @@ class AnyScalar {
     bool is_SX() const;
     bool is_MX() const;
     static std::vector<double> vector_double(const std::vector<AnyScalar>& v);
+    static std::vector<double> as_double(const std::vector<AnyScalar>& v);
+    static std::vector<SX> as_SX(const std::vector<AnyScalar>& v);
+    static std::vector<MX> as_MX(const std::vector<AnyScalar>& v);
     static bool is_double(const std::vector<AnyScalar>& v);
     static bool is_SX(const std::vector<AnyScalar>& v);
     static bool is_MX(const std::vector<AnyScalar>& v);
@@ -82,6 +85,8 @@ switch (AnyScalar::merge(x.t, y.t)) { \
 
     AnyScalar& operator+=(const AnyScalar& rhs);
 
+    static TensorType type(const std::vector<AnyScalar>& v);
+
   private:
     TensorType t;
     double data_double;
@@ -104,17 +109,23 @@ class AnyTensor {
     AnyTensor(const MT & t);
     static AnyTensor unity();
     AnyTensor();
-    bool is_double() const;
-    bool is_SX() const;
-    bool is_MX() const;
+    bool is_DT() const;
+    bool is_ST() const;
+    bool is_MT() const;
     DT as_DT() const { return this->operator DT();}
     ST as_ST() const { return this->operator ST();}
     MT as_MT() const { return this->operator MT();}
     static bool is_DT(const std::vector<AnyTensor>& v);
     static bool is_ST(const std::vector<AnyTensor>& v);
     static bool is_MT(const std::vector<AnyTensor>& v);
+    static std::vector<DT> as_DT(const std::vector<AnyTensor>& v);
+    static std::vector<ST> as_ST(const std::vector<AnyTensor>& v);
+    static std::vector<MT> as_MT(const std::vector<AnyTensor>& v);
+
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
+
+    static TensorType type(const std::vector<AnyTensor>& v);
 
     static AnyTensor solve(const AnyTensor& A, const AnyTensor& B);
 
@@ -144,9 +155,9 @@ class AnyTensor {
     #endif // SWIG
 
     std::string getRepresentation() const {
-      if (is_double()) return "AnyTensor:" + as_DT().getRepresentation();
-      if (is_SX()) return "AnyTensor:" + as_ST().getRepresentation();
-      if (is_MX()) return "AnyTensor:" + as_MT().getRepresentation();
+      if (is_DT()) return "AnyTensor:" + as_DT().getRepresentation();
+      if (is_ST()) return "AnyTensor:" + as_ST().getRepresentation();
+      if (is_MT()) return "AnyTensor:" + as_MT().getRepresentation();
       return "";
     }
 
