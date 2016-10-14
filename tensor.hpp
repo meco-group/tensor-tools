@@ -41,38 +41,38 @@ class Tensor {
 
   template<class S>
   Tensor(const Tensor<S>& a) : data_(T(a.data())), dims_(a.dims()) {
-  
+
   }
-  
+
   static Tensor<T> concat(const std::vector< Tensor<T> >& v) {
-    tensor_assert_message(false,"Not implemented");
+    tensor_assert_message(false, "Not implemented");
   }
-  
+
   static Tensor<T> pack(const std::vector< Tensor<T> >& v, int axis) {
     auto dims = v[0].dims();
-    
+
     std::vector<T> data;
-    
+
     for (auto& t : v) {
       tensor_assert(dims==t.dims());
       data.push_back(t.data());
     }
-    
+
     std::vector<int> new_dims = dims;
     new_dims.insert(new_dims.begin(), v.size());
     Tensor<T> ret = Tensor(veccat(data), new_dims);
-    
-    if (axis!=0) tensor_assert_message(false,"Not implemented");
+
+    if (axis!=0) tensor_assert_message(false, "Not implemented");
     return ret;
-    
+
   }
-  
+
   Tensor(const T& data, const std::vector<int>& dims) : data_(data), dims_(dims) {
     tensor_assert(data.is_dense());
     tensor_assert(data.numel()==product(dims));
   }
 
-  Tensor(const T& data) : data_(data), dims_({data.size1(),data.size2()}) {
+  Tensor(const T& data) : data_(data), dims_({data.size1(), data.size2()}) {
     tensor_assert(data.is_dense());
   }
 
@@ -81,7 +81,7 @@ class Tensor {
 
   Tensor(double a) : data_({a}), dims_({}) {
   }
-  
+
   Tensor() : data_({0}), dims_({}) {
   }
 
@@ -99,11 +99,11 @@ class Tensor {
   T matrix() const {
     tensor_assert(n_dims()<=2);
     if (n_dims()==0) {
-      return reshape(data_, std::pair<int,int>{1, 1});
+      return reshape(data_, std::pair<int, int>{1, 1});
     } else if (n_dims()==1) {
-      return reshape(data_, std::pair<int,int>{dims_[0], 1});
+      return reshape(data_, std::pair<int, int>{dims_[0], 1});
     } else if (n_dims()==2) {
-      return reshape(data_, std::pair<int,int>{dims_[0], dims_[1]});
+      return reshape(data_, std::pair<int, int>{dims_[0], dims_[1]});
     }
   }
   Tensor squeeze() const {
@@ -163,7 +163,7 @@ class Tensor {
   }
 
   static Tensor solve(const Tensor& A, const Tensor& B) {
-    return T::solve(A.matrix(),B.matrix(), "lapacklu", Dict());
+    return T::solve(A.matrix(), B.matrix(), "lapacklu", Dict());
   }
 
   Tensor operator+(const Tensor& rhs) const {
@@ -183,8 +183,8 @@ class Tensor {
   Tensor operator()(const std::vector<int>& ind) const {
     return index(ind);
   }
-  
-  
+
+
   Tensor index(const std::vector<int>& ind) const {
     // Check that input is a permutation of range(n_dims())
     tensor_assert(ind.size()==n_dims());
@@ -408,11 +408,15 @@ class Tensor {
             << obj.dims() << "): " << obj.data();
       }
   #endif // SWIG
-  
+
   std::string getRepresentation() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
+  }
+
+  void repr() const {
+    userOut() << getRepresentation() << std::endl;
   }
 
   private:
@@ -437,7 +441,7 @@ std::pair<int, int> Tensor<T>::normalize_dim(const std::vector<int> & dims) {
     } else {
       tensor_assert(false);
     }
-    return {0,0};
+    return {0, 0};
 }
 
 typedef Tensor<SX> ST;

@@ -115,7 +115,7 @@ class AnyTensor {
     static bool is_MT(const std::vector<AnyTensor>& v);
     std::vector<int> dims() const;
     //bool equals(const AnyTensor&rhs) const;
-    
+
     static AnyTensor solve(const AnyTensor& A, const AnyTensor& B);
 
 #ifndef SWIG
@@ -125,15 +125,31 @@ class AnyTensor {
 #endif
     static AnyTensor vertcat(const std::vector<AnyScalar>& v);
     static AnyTensor concat(const std::vector<AnyTensor>& v, int axis);
-    
+
     static AnyTensor pack(const std::vector<AnyTensor>& v, int axis);
     static std::vector<AnyTensor> unpack(const AnyTensor& v, int axis);
-    
+
     AnyTensor reorder_dims(const std::vector<int>& order) const;
     AnyTensor shape(const std::vector<int>& dims) const;
-    
+
     AnyTensor outer_product(const AnyTensor &b);
     AnyTensor inner(const AnyTensor&b);
+
+    #ifndef SWIG
+    /// Print a representation of the object to a stream (shorthand)
+    inline friend
+        std::ostream& operator<<(std::ostream &stream, const AnyTensor& obj) {
+            return stream << obj.getRepresentation();
+        }
+    #endif // SWIG
+
+    std::string getRepresentation() const {
+      if (is_double()) return "AnyTensor:" + as_DT().getRepresentation();
+      if (is_SX()) return "AnyTensor:" + as_ST().getRepresentation();
+      if (is_MX()) return "AnyTensor:" + as_MT().getRepresentation();
+      return "";
+    }
+
 
   private:
     TensorType t;
