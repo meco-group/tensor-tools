@@ -55,12 +55,12 @@ class Tensor {
 
     for (auto& t : v) {
       tensor_assert(dims==t.dims());
-      data.push_back(t.data());
+      data.push_back(vec(t.data()).T());
     }
 
     std::vector<int> new_dims = dims;
     new_dims.insert(new_dims.begin(), v.size());
-    Tensor<T> ret = Tensor(veccat(data), new_dims);
+    Tensor<T> ret = Tensor(vertcat(data), new_dims);
 
     if (axis!=0) tensor_assert_message(false, "Not implemented");
     return ret;
