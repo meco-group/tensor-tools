@@ -162,8 +162,8 @@ class Tensor {
     return Tensor<T>(v, dims);
   }
 
-  static Tensor solve(const Tensor& A, const Tensor& B) {
-    return T::solve(A.matrix(), B.matrix(), "lapacklu", Dict());
+  Tensor solve(const Tensor& B) const {
+    return T::solve(matrix(), B.matrix(), "lapacklu", Dict());
   }
 
   Tensor operator+(const Tensor& rhs) const {

@@ -30,23 +30,11 @@ AnyTensor AnyTensor::unity() {
   return DT(1, {});
 }
 
-#define ANYTENSOR_METHOD(METHOD) \
-if (is_DT()) return as_DT().METHOD; \
-if (is_ST()) return as_ST().METHOD; \
-if (is_MT()) return as_MT().METHOD; \
-tensor_assert(false); \
-return DT();
 
 
-AnyTensor AnyTensor::reorder_dims(const std::vector<int>& order) const {
-  ANYTENSOR_METHOD(reorder_dims(order))
-}
-AnyTensor AnyTensor::shape(const std::vector<int>& dims) const {
-  ANYTENSOR_METHOD(shape(dims))
-}
+
 
 TensorType AnyScalar::merge(TensorType a, TensorType b) {
-
   if (a == TENSOR_SX && b == TENSOR_MX) tensor_assert(0);
   if (a == TENSOR_MX && b == TENSOR_SX) tensor_assert(0);
   if (a == TENSOR_SX || b == TENSOR_SX) return TENSOR_SX;
@@ -83,83 +71,6 @@ AnyScalar& AnyScalar::operator+=(const AnyScalar& rhs) {
   }
 
   return this->operator=(ret);
-}
-
-AnyTensor AnyTensor::solve(const AnyTensor& A, const AnyTensor& B) {
-  AnyTensor ret;
-  switch (AnyScalar::merge(A.t, B.t)) {
-    case TENSOR_DOUBLE:
-      ret = solve(A.as_DT(), B.as_DT());
-      break;
-    case TENSOR_SX:
-      ret = solve(A.as_ST(), B.as_ST());
-      break;
-    case TENSOR_MX:
-      ret = solve(A.as_MT(), B.as_MT());
-      break;
-    default: tensor_assert(false);
-  }
-
-  return ret;
-}
-
-
-AnyTensor AnyTensor::outer_product(const AnyTensor &b) {
-  switch (AnyScalar::merge(t, b.t)) {
-    case TENSOR_DOUBLE:
-      return data_double.outer_product(b.data_double);
-    case TENSOR_SX:
-      return as_ST().outer_product(b.as_ST());
-    case TENSOR_MX:
-      return as_MT().outer_product(b.as_MT());
-    default: tensor_assert(false);
-  }
-  return DT();
-}
-
-AnyTensor AnyTensor::inner(const AnyTensor &b) {
-  switch (AnyScalar::merge(t, b.t)) {
-    case TENSOR_DOUBLE:
-      return data_double.inner(b.data_double);
-      break;
-    case TENSOR_SX:
-      return as_ST().inner(b.as_ST());
-      break;
-    case TENSOR_MX:
-      return as_MT().inner(b.as_MT());
-      break;
-    default: tensor_assert(false);
-  }
-  return DT();
-}
-
-AnyTensor AnyTensor::operator-() const {
-  switch (t) {
-    case TENSOR_DOUBLE:
-      return -data_double;
-    case TENSOR_SX:
-      return -data_sx;
-    case TENSOR_MX:
-      return -data_mx;
-    default: tensor_assert(false);
-  }
-  return DT();
-}
-
-std::vector<int> AnyTensor::dims() const {
-  switch (t) {
-    case TENSOR_DOUBLE:
-      return data_double.dims();
-      break;
-    case TENSOR_SX:
-      return data_sx.dims();
-      break;
-    case TENSOR_MX:
-      return data_mx.dims();
-      break;
-    default: tensor_assert(false);
-  }
-  return {};
 }
 
 /**bool AnyTensor::equals(const AnyTensor& rhs) const {
@@ -239,6 +150,23 @@ AnyTensor& AnyTensor::operator=(const AnyTensor& s) {
   data_sx = s.data_sx;
   data_mx = s.data_mx;
   return *this;
+}
+
+AnyTensor::AnyTensor(const AnyScalar& s) : data_double(0), data_sx(0), data_mx(0) {
+  t = s.type();
+  switch (t) {
+    case TENSOR_DOUBLE:
+      data_double = DT(s.as_double(), {1});
+      break;
+    case TENSOR_SX:
+      data_sx = ST(s.as_SX(), {1});
+      break;
+    case TENSOR_MX:
+      data_mx = MT(s.as_MX(), {1});
+      break;
+    default:
+      tensor_assert(false);
+  }
 }
 
 AnyTensor::AnyTensor(const AnyTensor& s) : data_double(0), data_sx(0), data_mx(0) {
