@@ -105,6 +105,7 @@ class Tensor {
     } else if (n_dims()==2) {
       return reshape(data_, std::pair<int, int>{dims_[0], dims_[1]});
     }
+    return 0;
   }
   Tensor squeeze() const {
     std::vector<int> dims;
