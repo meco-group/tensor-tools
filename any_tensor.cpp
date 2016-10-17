@@ -133,6 +133,19 @@ AnyTensor AnyTensor::inner(const AnyTensor &b) {
   return DT();
 }
 
+AnyTensor AnyTensor::operator-() const {
+  switch (t) {
+    case TENSOR_DOUBLE:
+      return -data_double;
+    case TENSOR_SX:
+      return -data_sx;
+    case TENSOR_MX:
+      return -data_mx;
+    default: tensor_assert(false);
+  }
+  return DT();
+}
+
 std::vector<int> AnyTensor::dims() const {
   switch (t) {
     case TENSOR_DOUBLE:

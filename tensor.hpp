@@ -171,6 +171,10 @@ class Tensor {
     return Tensor(data_+rhs.data_, dims_);
   }
 
+  Tensor operator-() const {
+    return Tensor(-data_, dims_);
+  }
+
   Tensor operator*(const Tensor& rhs) const {
     assert_match_dim(dims_, rhs.dims_);
     return Tensor(data_*rhs.data_, dims_);

@@ -146,6 +146,8 @@ class AnyTensor {
     AnyTensor outer_product(const AnyTensor &b);
     AnyTensor inner(const AnyTensor&b);
 
+    AnyTensor operator-() const;
+
     #ifndef SWIG
     /// Print a representation of the object to a stream (shorthand)
     inline friend
