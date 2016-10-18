@@ -11,6 +11,8 @@
 using namespace casadi;
 using namespace std;
 
+#include "../src/Optistack/optistack.h"
+
 template <class T>
 std::vector<T> reorder(const std::vector<T>& data, const std::vector<int>& order) {
   std::vector<T> ret(data.size());
@@ -422,6 +424,12 @@ class Tensor {
 
   void repr() const {
     userOut() << getRepresentation() << std::endl;
+  }
+
+
+  Tensor<DM> value(const OptistackSolver& sol) const {
+    return Tensor<DM>(sol.value(data_), dims_);
+    return 0;
   }
 
   private:

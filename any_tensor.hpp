@@ -3,7 +3,9 @@
 
 #include "tensor.hpp"
 
+
 enum TensorType {TENSOR_NULL, TENSOR_DOUBLE, TENSOR_SX, TENSOR_MX};
+
 
 
 #define ANYSCALAR_BINARY_OP(OP) \
@@ -176,6 +178,11 @@ class AnyTensor {
     int n_dims() const {
       ANYTENSOR_METHOD(n_dims());
       return 0;
+    }
+
+    AnyTensor value(const OptistackSolver& sol) const {
+      ANYTENSOR_METHOD(value(sol));
+      return DT();
     }
 
     AnyTensor outer_product(const AnyTensor &b) const {
