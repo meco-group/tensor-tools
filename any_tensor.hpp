@@ -180,11 +180,12 @@ class AnyTensor {
       return 0;
     }
 
-    AnyTensor value(const OptistackSolver& sol) const {
-      ANYTENSOR_METHOD(value(sol));
-      return DT();
+    AnyTensor operator>=(const AnyTensor &b) const {
+      ANYTENSOR_BINARY((*this), b, operator>=);
     }
-
+    AnyTensor operator<=(const AnyTensor &b) const {
+      ANYTENSOR_BINARY((*this), b, operator<=);
+    }
     AnyTensor outer_product(const AnyTensor &b) const {
       ANYTENSOR_BINARY((*this), b, outer_product);
     }
